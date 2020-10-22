@@ -1,0 +1,54 @@
+{
+    "LOGIN":{
+        "login": "Login",
+        "mailrequired": "E-Mail is necessary",
+        "correct": "Please provide the correct e-mail",
+        "password": "Password",
+        "pwrequired": "Password is required",
+        "company": "Select Company",       
+        "privacy": "Privacy Policy",
+        "lost": "Lost password"
+    },
+    "BETRIEB":{
+        "back": "Back",
+        "selection": "Company Selection",
+        "load": "Load Data",
+        "search": "Search Company"
+    }, 
+    "HOME":{
+        "title": "Home",
+        "greeting": "Hey {{name}}, you are in the home menu",
+        "withcode": "<br><br>Codetest <b>yeet</b>!",
+        "btn": "Show Alert"
+    },
+    "ALERT":{
+        "header": "Error",
+        "msg": "There was a problem with your operation"
+    },
+    "PRIVACY":{
+        "back": "Back",
+        "policy": "Privacy policy",
+        "load": "Load Data"        
+    },
+    "PASSWORD":{
+        "back": "Back",
+        "lost": "Lost password",
+        "lostdesc": "Lost password description",
+        "info": "Information",
+        "username": "Username",
+        "submit": "Submit"
+    },
+    "CAL":{
+        "month": "Month",
+        "week": "Week",
+        "day": "Day"
+    },
+    "CALMODAL":{
+        "title": "Title",
+        "desc": "Description",
+        "start": "Starttime",
+        "end": "Endtime",
+        "emp": "Employee",
+        "allday": "All Day"
+    }
+}

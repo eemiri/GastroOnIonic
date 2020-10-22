@@ -1,0 +1,53 @@
+<ion-toolbar color="primary">
+  <ion-buttons slot="start">
+    <ion-button (click)="close()">
+      <ion-icon name="close" slot="icon-only"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+  <ion-title>{{ viewTitle }}</ion-title>
+  <ion-buttons slot="end">
+    <ion-button (click)="save()">
+      <ion-icon name="checkmark" slot="icon-only"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-toolbar>
+ 
+<ion-content>
+  <ion-item>
+    <ion-label position="stacked">{{"CALMODAL.title" | translate}}</ion-label>
+    <ion-input type="text" [(ngModel)]="event.title"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">{{"CALMODAL.desc" | translate}}</ion-label>
+    <ion-input type="text" [(ngModel)]="event.desc"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">{{"CALMODAL.start" | translate}}</ion-label>
+    <ion-datetime displayFormat="DD/MM/YYYY HH:mm" pickerFormat="MMM D:HH:mm" [(ngModel)]="event.startTime" [min]="minDate"></ion-datetime>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">{{"CALMODAL.end" | translate}}</ion-label>
+    <ion-datetime displayFormat="DD/MM/YYYY HH:mm" pickerFormat="MMM D:HH:mm" [(ngModel)]="event.endTime" [min]="minDate"></ion-datetime>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">{{"CALMODAL.allday" | translate}}?</ion-label>
+    <ion-checkbox [(ngModel)]="event.allDay"></ion-checkbox>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">{{"CALMODAL.emp" | translate}}</ion-label>
+    <ion-input type="text" [(ngModel)]="event.employee"></ion-input>
+  </ion-item>
+  
+ 
+  <calendar 
+    *ngIf="modalReady"
+    [locale]="calendar.locale"
+    [calendarMode]="calendar.mode"
+    [currentDate]="calendar.currentDate"
+    (onTitleChanged)="onViewTitleChanged($event)"
+    (onTimeSelected)="onTimeSelected($event)"
+    lockSwipes="true"
+  >
+  <!--Den Kalender hier oben noch sprachlich anpassen-->
+  </calendar>
+</ion-content>

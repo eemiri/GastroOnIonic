@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>    
+    <ion-buttons left>
+      <button ion-button (click)="closeModal(null)">
+        {{"BETRIEB.back" | translate}}
+      </button>
+    </ion-buttons>
+    <ion-title>{{"BETRIEB.selection" | translate}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- <div *ngIf="loading">
+    <div class="custom-loading-spinner">
+      <ion-spinner></ion-spinner><span>{{"BETRIEB.load" | translate}}</span>
+    </div>
+  </div> -->
+  <!-- <div *ngIf="!loading"> -->
+    <div>
+    <ion-searchbar
+      placeholder="{{'BETRIEB.search' | translate}}"
+      (ionInput)="searchBetriebe($event)"
+    ></ion-searchbar>
+    <ion-list>
+      <div *ngFor="let betrieb of betriebeList">
+        <ion-item-divider *ngIf="betrieb?.ShowDivider" sticky
+          >{{betrieb?.Betriebsname.charAt(0).toUpperCase()}}</ion-item-divider
+        >
+        <ion-item (click)="setBetrieb(betrieb)">
+          <h2>{{betrieb?.Betriebsname}}</h2>
+          <p>{{betrieb?.Strasse}}, {{betrieb?.Ort}}</p>
+        </ion-item>
+      </div>
+    </ion-list>
+  </div>
+  <!-- </div> -->
+</ion-content>
+

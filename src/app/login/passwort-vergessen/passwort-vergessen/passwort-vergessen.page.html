@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons left>
+      <button ion-button (click)="closeModal()">
+        {{"PASSWORD.back" | translate}}
+      </button>
+    </ion-buttons>
+    <ion-title>{{"PASSWORD.lost" | translate}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Info Card -->
+  <ion-card>
+    <ion-card-header>
+      {{"PASSWORD.info" | translate}}
+    </ion-card-header>
+    <ion-card-content>
+      {{"PASSWORD.lostdesc" | translate}}
+    </ion-card-content>
+  </ion-card>
+
+  <ion-item>
+    <ion-input
+      type="text"
+      [(ngModel)]="benutzername"
+      placeholder="{{'PASSWORD.username' | translate}}"
+    ></ion-input>
+  </ion-item>
+  <ion-item (click)="openBetriebeModal()">
+    <ion-label>{{betrieb}}</ion-label>
+    <ion-icon class="betriebWahl" name="add" clear item-end></ion-icon>
+  </ion-item>
+  <ion-item>
+    <ion-input
+      type="text"
+      [(ngModel)]="email"
+      placeholder="E-Mail"
+    ></ion-input>
+  </ion-item>
+
+  <div padding>
+    <button
+      ion-button
+      color="primary"
+      block
+      [disabled]="!validateEmail(email)"
+      (click)="resetPassword()">
+      <ion-spinner *ngIf="loading"></ion-spinner>
+      &nbsp; {{"PASSWORD.sumbit" | translate}}
+    </button>
+  </div>
+</ion-content>

@@ -1,0 +1,54 @@
+{    
+    "LOGIN":{
+        "login": "Anmelden",
+        "mailrequired": "E-Mail wird benötigt",
+        "correct": "Bitte richtige E-Mail Adresse eingeben",
+        "password": "Passwort",
+        "pwrequired": "Passwort wird benötigt",
+        "company": "Betrieb wählen",
+        "privacy": "Datenschutz",
+        "lost": "Passwort Vergessen"       
+    },
+    "BETRIEB":{
+        "back": "Zurück",
+        "selection": "Betriebsauswahl",
+        "load": "Daten werden geladen",
+        "search": "Betrieb suchen"
+    },  
+    "HOME":{
+        "title": "Startseite",
+        "greeting": "Hallo {{name}}, du bist im Home Menue",
+        "withcode": "<br><br>Codetest-de <b>yeet</b>!",
+        "btn": "Alarm anzeigen"
+    },
+    "ALERT":{
+        "header": "Fehler",
+        "msg": "Es gab ein Problem bei der Operation"
+    },
+    "PRIVACY":{
+        "back": "Zurück",
+        "policy": "Datenschutz",
+        "load": "Daten werden geladen"        
+    },
+    "PASSWORD":{
+        "back": "Zurück",
+        "lost": "Passwort vergessen",
+        "lostdesc": "Passwortbeschreibung vergessen",
+        "info": "Information",
+        "username": "Benutzername",
+        "submit": "Senden"
+    },
+    "CAL":{
+        "month": "Monat",
+        "week": "Woche",
+        "day": "Tag"
+    },
+    "CALMODAL":{
+        "title": "Name",
+        "desc": "Beschreibung",
+        "start": "Startzeit",
+        "end": "Endzeit",
+        "emp": "Mitarbeiter",
+        "allday": "Ganztägig"
+    }
+}
