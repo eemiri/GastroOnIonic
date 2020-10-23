@@ -41,13 +41,13 @@ export class LoginPage implements OnInit {
   ) {}
     
   ngOnInit() {
-    // this.credentials = this.fb.group({//placeholdervalues, if changed it doesn't work
-    //   email: ['eve.holt@reqres.in', [Validators.required, Validators.email]],
-    //   password: ['cityslicka', [Validators.required, Validators.minLength(6)]],
-    // });
-    this.credentials = this.fb.group({
-      email: 
-    })
+    this.credentials = this.fb.group({//placeholdervalues, if changed it doesn't work
+      email: ['eve.holt@reqres.in', [Validators.required, Validators.email]],
+      password: ['cityslicka', [Validators.required, Validators.minLength(6)]],
+    });
+    // this.credentials = this.fb.group({        //mache hier den richtigen login, das oben muss aber stehen damit der login klappt vorerst
+    //   email: 
+    // })
   }
  
   async login() {
