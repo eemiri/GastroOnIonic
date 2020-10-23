@@ -36,7 +36,8 @@
         "lostdesc": "With this form you can reset your password. After submitting the form you will receive an e-mail whith a link that allows you to change your password",
         "info": "Information",
         "username": "Username",
-        "submit": "Submit"
+        "submit": "Submit",
+        "company": "Select Company"
     },
     "CAL":{
         "month": "Month",

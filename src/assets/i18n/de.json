@@ -36,7 +36,8 @@
         "lostdesc": "Mit diesem Formular können sie ihr Passwort zurücksetzen. Nach dem Absenden erhalten Sie eine E-Mail an die angegebene Adresse. Dort können sie nach Öffnen des Links ihr Passwort ändern.",
         "info": "Information",
         "username": "Benutzername",
-        "submit": "Senden"
+        "submit": "Senden",
+        "company": "Betrieb wählen"
     },
     "CAL":{
         "month": "Monat",

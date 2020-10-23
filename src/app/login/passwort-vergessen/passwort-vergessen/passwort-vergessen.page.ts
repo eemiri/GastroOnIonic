@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { NavController, NavParams, ModalController, LoadingController } from '@ionic/angular';
 import { Betrieb } from 'src/app/model/betrieb.model';
 import { BenutzerService } from 'src/app/services/benutzer.service';
@@ -12,12 +13,13 @@ import { BetriebswahlPage } from '../../betriebswahl/betriebswahl/betriebswahl.p
   styleUrls: ['./passwort-vergessen.page.scss'],
 })
 export class PasswortVergessenPage implements OnInit {
-  private email: string = "";
-  public loading: boolean = false;
 
   public benutzername: string = "";
   public betrieb: string = "";
   public betriebId: number = -1;
+
+  private email: string = "";
+  public loading: boolean = false;
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -25,18 +27,21 @@ export class PasswortVergessenPage implements OnInit {
     private benutzerService: BenutzerService,
     private helperService: HelperService,
     private language: LanguageService,
-    private loadingController: LoadingController) { }
+    private loadingController: LoadingController,
+    ) { }
 
   ngOnInit() {
-  }
-  ionViewDidLoad() {
     this.benutzername = this.navParams.get("benutzername");
     this.betrieb = this.navParams.get("betrieb");
     this.betriebId = this.navParams.get("betriebId");
   }
+  
+  ionViewDidLoad() {
+    
+  }
 
   ionViewWillEnter() {
-    this.language.getLangForString("PLEASE SELECT COMPANY").then(data => {
+    this.language.getLangForString("PASSWORD.company").then(data => {
       this.betrieb = data;
     });
   }

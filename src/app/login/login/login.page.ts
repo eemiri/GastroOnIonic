@@ -9,6 +9,8 @@ import { LanguagePopoverPage } from 'src/app/pages/language-popover/language-pop
 import { HelperService } from 'src/app/services/helper.service';
 import { AppDatenschutzPage } from '../app-datenschutz/app-datenschutz/app-datenschutz.page';
 import { PasswortVergessenPage } from '../passwort-vergessen/passwort-vergessen/passwort-vergessen.page';
+import { DeviceInformation } from 'src/app/model/deviceInformation.model';
+import { UserData } from 'src/app/model/user-data';
  
 @Component({
   selector: 'app-login',
@@ -18,12 +20,12 @@ import { PasswortVergessenPage } from '../passwort-vergessen/passwort-vergessen/
 export class LoginPage implements OnInit {
   credentials: FormGroup;
 
+  loginObj: UserData;
+  deviceInformation: DeviceInformation;
   betrieb: string = "";
   betriebId: number = -1;
-
   benutzername: string = "";
   passwort: string = "";
-
   dataSecurityAccepted: boolean = false;
 
  
@@ -39,17 +41,31 @@ export class LoginPage implements OnInit {
   ) {}
     
   ngOnInit() {
-    this.credentials = this.fb.group({//placeholdervalues, if changed it doesn't work
-      email: ['eve.holt@reqres.in', [Validators.required, Validators.email]],
-      password: ['cityslicka', [Validators.required, Validators.minLength(6)]],
-    });
+    // this.credentials = this.fb.group({//placeholdervalues, if changed it doesn't work
+    //   email: ['eve.holt@reqres.in', [Validators.required, Validators.email]],
+    //   password: ['cityslicka', [Validators.required, Validators.minLength(6)]],
+    // });
+    this.credentials = this.fb.group({
+      email: 
+    })
   }
  
   async login() {
+    
+
+    this.loginObj = new UserData(
+      this.benutzername,
+      this.betriebId,
+      this.passwort,
+      this.betrieb,
+      this.deviceInformation.Uuid,
+      this.deviceInformation.DeviceToken,
+      this.deviceInformation.Platform
+    );
     const loading = await this.loadingController.create();
     await loading.present();
-    
-    this.authService.login(this.credentials.value).subscribe(
+
+    this.authService.login(this.loginObj).subscribe(//gewechselt von credentials zu loginobj
       async (res) => {
         await loading.dismiss();        
         this.router.navigateByUrl('/home', { replaceUrl: true });
@@ -122,7 +138,7 @@ export class LoginPage implements OnInit {
     }
   }
 
-  async openResetPasswordModal() {
+  async openResetPasswordModal() {    
     const passwortVergessenModal = await this.modalController.create({
       component: PasswortVergessenPage,
       componentProps:{

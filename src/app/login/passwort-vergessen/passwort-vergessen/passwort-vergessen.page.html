@@ -27,28 +27,34 @@
       placeholder="{{'PASSWORD.username' | translate}}"
     ></ion-input>
   </ion-item>
-  <ion-item (click)="openBetriebeModal()">
-    <ion-label>{{betrieb}}</ion-label>
-    <ion-icon class="betriebWahl" name="add" clear item-end></ion-icon>
-  </ion-item>
   <ion-item>
-    <ion-label position="floating">E-Mail</ion-label>
-    <ion-input type="email" required formControlName="email"></ion-input>
+    <ion-input
+      type="text"
+      [(ngModel)]="email"
+      placeholder="{{'EMAIL' | translate}}"
+      required      
+    ></ion-input>
   </ion-item>
-  <div *ngIf="(email.dirty || email.touched) && email.errors" class="errors">
-    <span *ngIf="email.errors?.required">{{"LOGIN.mailrequired"|translate}}</span>
-    <span *ngIf="email.errors?.email">{{"LOGIN.correct"|translate}}</span>
-  </div>
+  <ion-item (click)="openBetriebeModal()">
+    <ion-icon name="bookmark" slot="start"></ion-icon>
+    <ion-label>{{betrieb == '' ? ('PASSWORD.company' | translate) : betrieb}}</ion-label>
+    <ion-icon class="betriebWahl" name="add"  slot="end"></ion-icon>
+  </ion-item>
+  
 
-  <div>
-    <button
+
+  <ion-grid>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <ion-button
       ion-button
       color="primary"
       block
       [disabled]="!validateEmail(email)"
       (click)="resetPassword()">
-      <ion-spinner *ngIf="loading"></ion-spinner>
       &nbsp; {{"PASSWORD.submit" | translate}}
-    </button>
-  </div>
+    </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

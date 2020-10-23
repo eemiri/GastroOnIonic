@@ -19,7 +19,7 @@ export class BenutzerService {
         .set("benutzerID", benutzer_id.toString())
         .set("passwort", passwort.toString());
   
-      return this.http.post(this.helperService.getUrl("ChangePassword"), params, {
+      return this.http.post<any>(this.helperService.getUrl("ChangePassword"), params, {
         headers: this.headers
       });
     }
@@ -27,7 +27,7 @@ export class BenutzerService {
     deaktiviereBenutzer(benutzer_id: number): Observable<any> {
       const params = new HttpParams().set("benutzerID", benutzer_id.toString());
   
-      return this.http.post(
+      return this.http.post<any>(
         this.helperService.getUrl("DeaktiviereBenutzer"),
         params,
         { headers: this.headers }
@@ -39,7 +39,7 @@ export class BenutzerService {
         .set("status", online_status.toString())
         .set("benutzerID", benutzer_id.toString());
   
-      return this.http.post(
+      return this.http.post<any>(
         this.helperService.getUrl("UpdateOnlineStatusEinstellung"),
         params,
         { headers: this.headers }
@@ -52,7 +52,7 @@ export class BenutzerService {
         .set("Id", betriebsId.toString())
         .set("email", email);
   
-      return this.http.post(
+      return this.http.post<any>(
         this.helperService.getUrl("RequestPassword"),
         params,
         { headers: this.headers }
@@ -62,7 +62,7 @@ export class BenutzerService {
     deleteAvatar(benutzer_id: number): Observable<any> {
       const params = new HttpParams().set("benutzerID", benutzer_id.toString());
   
-      return this.http.post(
+      return this.http.post<any>(
         this.helperService.getUrl("DeleteProfilbild"),
         params,
         { headers: this.headers }
