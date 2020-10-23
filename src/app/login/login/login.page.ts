@@ -8,6 +8,7 @@ import { BetriebswahlPage } from '../betriebswahl/betriebswahl/betriebswahl.page
 import { LanguagePopoverPage } from 'src/app/pages/language-popover/language-popover.page';
 import { HelperService } from 'src/app/services/helper.service';
 import { AppDatenschutzPage } from '../app-datenschutz/app-datenschutz/app-datenschutz.page';
+import { PasswortVergessenPage } from '../passwort-vergessen/passwort-vergessen/passwort-vergessen.page';
  
 @Component({
   selector: 'app-login',
@@ -19,6 +20,9 @@ export class LoginPage implements OnInit {
 
   betrieb: string = "";
   betriebId: number = -1;
+
+  benutzername: string = "";
+  passwort: string = "";
 
   dataSecurityAccepted: boolean = false;
 
@@ -33,7 +37,7 @@ export class LoginPage implements OnInit {
     private popoverCtrl: PopoverController,
     private helperService: HelperService
   ) {}
- 
+    
   ngOnInit() {
     this.credentials = this.fb.group({//placeholdervalues, if changed it doesn't work
       email: ['eve.holt@reqres.in', [Validators.required, Validators.email]],
@@ -81,34 +85,26 @@ export class LoginPage implements OnInit {
   }
 
 
-  async openBetriebeModal() {
-    
+  async openBetriebeModal() {    
     const betriebeModal = await this.modalController.create({
       component: BetriebswahlPage
-      //cssClass: this.helperService.getModalOpts()
-    });
-    
-    // const {data} = await betriebeModal.onDidDismiss();
-    // this.betrieb = data.Betriebsname;
-    // this.betriebId = data.Id;
+    });    
     betriebeModal.onDidDismiss().then((ergebnisBetrieb) => {
       if (ergebnisBetrieb != null) {
         this.betrieb = ergebnisBetrieb.data.Betriebsname;
         this.betriebId = ergebnisBetrieb.data.Id;
       }
-    });
-   
-    return await betriebeModal.present();
-//  return this.http.get(this.helperService.getUrl("GetBetriebeStartsWith")).pipe(map((betriebe: Array<Betrieb>) =>{
-//       return betriebe.map((betrieb) => new Betrieb(betrieb.Id, betrieb.Betriebsname, betrieb.Strasse, betrieb.Ort, betrieb.ShowDivider));
-//     }));
-             
+    });   
+    return await betriebeModal.present();             
   }
 
   async openDataSecurityTextModal() {
-    if (isDevMode()) {
+    if (!isDevMode()) {
       const modal = await this.modalController.create({
-        component: AppDatenschutzPage,        
+        component: AppDatenschutzPage,
+        componentProps:{
+          accepted : this.dataSecurityAccepted
+        }        
         //cssClass: this.helperService.getModalOpts()
       });
 
@@ -125,4 +121,22 @@ export class LoginPage implements OnInit {
       this.dataSecurityAccepted = true;
     }
   }
+
+  async openResetPasswordModal() {
+    const passwortVergessenModal = await this.modalController.create({
+      component: PasswortVergessenPage,
+      componentProps:{
+        benutzername: this.benutzername,
+        betrieb: this.betrieb,
+        betriebId: this.betriebId
+      }
+    }); 
+    
+    passwortVergessenModal.present();
+  }
+
+
+
+
 }
+

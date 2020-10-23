@@ -28,7 +28,7 @@ export class BetriebswahlPage implements OnInit {
 
   ionViewDidEnter() {
     this.getBetriebe();
-    this.rawBetriebeList.push(new Betrieb(0, "test", "", "", false)); 
+    //this.rawBetriebeList.push(new Betrieb(0, "test", "", "", false)); 
     this.prepareDivider();
     this.initList();
   }

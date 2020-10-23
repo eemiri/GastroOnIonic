@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalController, NavController, NavParams } from '@ionic/angular';
+import { Component, Input, isDevMode, OnInit } from '@angular/core';
+import { LoadingController, ModalController, NavController, NavParams } from '@ionic/angular';
 import { LoginService } from 'src/app/services/login.service';
 
 @Component({
@@ -8,17 +8,24 @@ import { LoginService } from 'src/app/services/login.service';
   styleUrls: ['./app-datenschutz.page.scss'],
 })
 export class AppDatenschutzPage implements OnInit {
+  @Input() accepted: boolean;
 
   public loading: boolean = false;
 
   public dataSecurityText: string;
 
+  scrollDepthTriggered: boolean = false;
+
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     private loginService: LoginService,
-    private modalCtrl: ModalController
-  ) {}
+    private modalCtrl: ModalController,
+    private loadingController: LoadingController
+  ) {
+    navParams.get('accepted');
+  }
 
   ngOnInit() {
   }
@@ -27,20 +34,61 @@ export class AppDatenschutzPage implements OnInit {
     this.getDataSecurtityText();
   }
 
-  getDataSecurtityText() {
-    this.loading = true;
+  async getDataSecurtityText() {
+    const loading = await this.loadingController.create();
+    await loading.present();
+
     this.loginService.getDataSecurityText().subscribe(
-      resp => {
+      async (resp) => {
         this.dataSecurityText = resp;
-        this.loading = false;
-      },
-      err => {
-        //this.viewCtrl.dismiss(true);
-      }
+        await loading.dismiss();
+      },      
     );
   }
 
   dismiss(bool: boolean) {
     this.modalCtrl.dismiss(bool);
   }
+
+//see if user has scrolled down to the button
+async CheckScroll(event: any){
+  if(this.scrollDepthTriggered) {
+    return;
+  }
+  if(isDevMode()){
+    console.log("Scroll:", event);
+  }
+  if(event.target.localName != "ion-content") {
+    // not sure if this is required, just playing it safe
+    return;
+  }
+  const scrollElement = await event.target.getScrollElement();
+  if(isDevMode()){
+    console.log({scrollElement});
+  }
+  // minus clientHeight because trigger is scrollTop
+  // otherwise you hit the bottom of the page before 
+  // the top screen can get to 80% total document height
+  const scrollHeight = scrollElement.scrollHeight - scrollElement.clientHeight;
+  if(isDevMode()){
+    console.log({scrollHeight});
+  }
+  const currentScrollDepth = event.detail.scrollTop;
+  if(isDevMode()){
+    console.log({currentScrollDepth});
+  }
+  const targetPercent = 99;
+  let triggerDepth = ((scrollHeight / 100) * targetPercent);
+  if(isDevMode()){
+    console.log({triggerDepth});
+  }
+  if(currentScrollDepth > triggerDepth) {
+    if(isDevMode()){
+      console.log(`Scrolled to ${targetPercent}%`);
+    }
+    // this ensures that the event only triggers once
+    this.scrollDepthTriggered = true;
+    // do your analytics tracking here
+  }
+}
 }

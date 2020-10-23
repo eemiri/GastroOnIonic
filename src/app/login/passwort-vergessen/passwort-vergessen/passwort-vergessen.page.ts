@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, NavParams, ModalController } from '@ionic/angular';
+import { NavController, NavParams, ModalController, LoadingController } from '@ionic/angular';
 import { Betrieb } from 'src/app/model/betrieb.model';
 import { BenutzerService } from 'src/app/services/benutzer.service';
 import { HelperService } from 'src/app/services/helper.service';
@@ -24,7 +24,8 @@ export class PasswortVergessenPage implements OnInit {
     private modalCtrl: ModalController,
     private benutzerService: BenutzerService,
     private helperService: HelperService,
-    private language: LanguageService) { }
+    private language: LanguageService,
+    private loadingController: LoadingController) { }
 
   ngOnInit() {
   }
@@ -45,34 +46,36 @@ export class PasswortVergessenPage implements OnInit {
     return re.test(email);
   }
 
-  resetPassword() {
-    this.loading = true;
+  async resetPassword() {
+    const loading = await this.loadingController.create();
+    await loading.present();
     if (this.email != "" && this.validateEmail(this.email)) {
       this.benutzerService
         .requestPassword(this.email, this.benutzername, this.betriebId)
-        .subscribe(response => {
+        .subscribe(async (response) => {
           if (response.Erfolg) {
             this.closeModal();
           } else {
             this.helperService.showBottomToast(response.Message);
           }
-          this.loading = false;
+          await loading.dismiss();
         });
     } else {
       this.helperService.showBottomToast("EMAIL_NOT_VALID");
     }
   }
 
-  async openBetriebeModal() {
+  async openBetriebeModal() {    
     const betriebeModal = await this.modalCtrl.create({
-      component: BetriebswahlPage      
-    });
-
-    const {data} = await betriebeModal.onDidDismiss();
-    this.betrieb = data.Betriebsname;
-    this.betriebId = data.Id; 
-
-    betriebeModal.present();
+      component: BetriebswahlPage
+    });    
+    betriebeModal.onDidDismiss().then((ergebnisBetrieb) => {
+      if (ergebnisBetrieb != null) {
+        this.betrieb = ergebnisBetrieb.data.Betriebsname;
+        this.betriebId = ergebnisBetrieb.data.Id;
+      }
+    });   
+    return await betriebeModal.present();             
   }
 
   closeModal() {

@@ -1,9 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons left>
-      <button ion-button (click)="closeModal()">
+    <ion-buttons slot="start">
+      <ion-button  (click)="closeModal()">
         {{"PASSWORD.back" | translate}}
-      </button>
+      </ion-button>
     </ion-buttons>
     <ion-title>{{"PASSWORD.lost" | translate}}</ion-title>
   </ion-toolbar>
@@ -32,14 +32,15 @@
     <ion-icon class="betriebWahl" name="add" clear item-end></ion-icon>
   </ion-item>
   <ion-item>
-    <ion-input
-      type="text"
-      [(ngModel)]="email"
-      placeholder="E-Mail"
-    ></ion-input>
+    <ion-label position="floating">E-Mail</ion-label>
+    <ion-input type="email" required formControlName="email"></ion-input>
   </ion-item>
+  <div *ngIf="(email.dirty || email.touched) && email.errors" class="errors">
+    <span *ngIf="email.errors?.required">{{"LOGIN.mailrequired"|translate}}</span>
+    <span *ngIf="email.errors?.email">{{"LOGIN.correct"|translate}}</span>
+  </div>
 
-  <div padding>
+  <div>
     <button
       ion-button
       color="primary"
@@ -47,7 +48,7 @@
       [disabled]="!validateEmail(email)"
       (click)="resetPassword()">
       <ion-spinner *ngIf="loading"></ion-spinner>
-      &nbsp; {{"PASSWORD.sumbit" | translate}}
+      &nbsp; {{"PASSWORD.submit" | translate}}
     </button>
   </div>
 </ion-content>

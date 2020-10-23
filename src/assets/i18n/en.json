@@ -7,7 +7,7 @@
         "pwrequired": "Password is required",
         "company": "Select Company",       
         "privacy": "Privacy Policy",
-        "lost": "Lost password"
+        "lost": "Forgot your password"
     },
     "BETRIEB":{
         "back": "Back",
@@ -33,7 +33,7 @@
     "PASSWORD":{
         "back": "Back",
         "lost": "Lost password",
-        "lostdesc": "Lost password description",
+        "lostdesc": "With this form you can reset your password. After submitting the form you will receive an e-mail whith a link that allows you to change your password",
         "info": "Information",
         "username": "Username",
         "submit": "Submit"

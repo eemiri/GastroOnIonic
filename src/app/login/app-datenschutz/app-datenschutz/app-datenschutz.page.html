@@ -1,34 +1,34 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons left>
-      <button ion-button (click)="dismiss(null)">
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss(null)">
         {{"PRIVACY.back" | translate}}
-      </button>
+      </ion-button>
     </ion-buttons>
     <ion-title>{{"PRIVACY.policy" | translate}}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
-  <div *ngIf="loading">
+<ion-content class="ion-padding" scroll-events="true" (ionScroll)="CheckScroll($event)">
+  <!-- <div *ngIf="loading">
     <div class="custom-loading-spinner">
       <ion-spinner></ion-spinner><span>{{"PRIVACY.load" | translate}}</span>
     </div>
+  </div> -->
+
+  <div class="gepadded">  
+
+    <div [innerHTML]="dataSecurityText"></div>
   </div>
+  <ion-fab *ngIf="scrollDepthTriggered" vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="dismiss(true)">
+      <ion-icon name="checkmark"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
-  <div *ngIf="!loading">
-    <ion-fab bottom right>
-      <button ion-fab (click)="dismiss(true)">
-        <ion-icon name="checkmark"></ion-icon>
-      </button>
-    </ion-fab>
-
-    <ion-fab bottom left>
-      <button ion-fab (click)="dismiss(false)">
-        <ion-icon name="close"></ion-icon>
-      </button>
-    </ion-fab>
-
-    <div class="scroll-content" [innerHTML]="dataSecurityText"></div>
-  </div>
+  <ion-fab *ngIf="scrollDepthTriggered" vertical="bottom" horizontal="start" slot="fixed">
+    <ion-fab-button (click)="dismiss(false)">
+      <ion-icon name="close"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
