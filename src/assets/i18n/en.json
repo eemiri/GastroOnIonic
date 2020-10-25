@@ -2,8 +2,8 @@
     "LOGIN":{
         "login": "Login",
         "username": "Username",
-        "mailrequired": "E-Mail is necessary",
-        "correct": "Please provide the correct e-mail",
+        "mailrequired": "Username is necessary",
+        "correct": "Please provide a username",
         "password": "Password",
         "pwrequired": "Password is required",
         "company": "Select Company",       

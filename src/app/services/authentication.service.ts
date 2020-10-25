@@ -44,7 +44,7 @@ export class AuthenticationService {
       .append("Uuid", loginObj.uuid)
       .append("DeviceToken", loginObj.deviceToken)
       .append("Platform", loginObj.platform);
-    return this.http.post(this.helperService.getUrl("Login"), params, {headers: this.headers}).pipe( //hier die api route zum richtigen server machen
+    return this.http.post(this.helperService.getUrl("Login"), params, {headers: this.headers}).pipe( 
       map((data: any) => data.token),
       switchMap(token => {//switch from original observable to a new observable
         return from(Storage.set({key: TOKEN_KEY, value: JSON.stringify({loginObj})}));//from transforms promise to observable

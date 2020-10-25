@@ -41,9 +41,10 @@ export class LoginPage implements OnInit {
   ) {}
     
   ngOnInit() {
-    this.credentials = this.fb.group({//placeholdervalues, if changed it doesn't work
-      email: ['', [Validators.required, Validators.email]],
+    this.credentials = this.fb.group({
+      username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      privacy: ['', Validators.required]//vielleicht muss hier checked statt true
     });
   }
  
@@ -59,30 +60,34 @@ export class LoginPage implements OnInit {
       this.deviceInformation.DeviceToken,
       this.deviceInformation.Platform
     );
+    
     const loading = await this.loadingController.create();
     await loading.present();
 
-    this.authService.login(this.loginObj).subscribe(//gewechselt von credentials zu loginobj
-      async (res) => {
-        await loading.dismiss();        
-        this.router.navigateByUrl('/home', { replaceUrl: true });
-      },
-      async (res) => {
-        await loading.dismiss();
-        const alert = await this.alertController.create({
-          header: 'Login failed',
-          message: res.error.error,
-          buttons: ['OK'],
-        });
- 
-        await alert.present();
-      }
-    );
+
+    if(this.credentials.valid){
+      this.authService.login(this.loginObj).subscribe(//gewechselt von credentials zu loginobj
+        async (res) => {
+          await loading.dismiss();        
+          this.router.navigateByUrl('/home', { replaceUrl: true });
+        },
+        async (res) => {
+          await loading.dismiss();
+          const alert = await this.alertController.create({
+            header: 'Login failed',
+            message: res.error.error,
+            buttons: ['OK'],
+          });
+   
+          await alert.present();
+        }
+      );
+    }    
   }
  
-  // Easy access for form fields
+  //Easy access for form fields
   get email() {
-    return this.credentials.get('email');
+    return this.credentials.get('username');
   }
   
   get password() {
@@ -111,8 +116,8 @@ export class LoginPage implements OnInit {
     return await betriebeModal.present();             
   }
 
-  async openDataSecurityTextModal() {
-    if (!isDevMode()) {
+  async openDataSecurityTextModal() {{
+    //if (!isDevMode()) {
       const modal = await this.modalController.create({
         component: AppDatenschutzPage,
         componentProps:{
@@ -126,12 +131,12 @@ export class LoginPage implements OnInit {
       modal.onDidDismiss().then((confirmed) => {
         if (confirmed != null){
           this.dataSecurityAccepted = confirmed.data;
-        }
+        } 
       });    
       
       modal.present();
-    } else {
-      this.dataSecurityAccepted = true;
+   // } else {
+      //this.dataSecurityAccepted = true; //nicht sicher ob ich das hier auskommentiert lassen kann, im büro testen
     }
   }
 

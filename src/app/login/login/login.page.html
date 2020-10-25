@@ -15,12 +15,12 @@
     <div class="input-group">
       <ion-item>
         <ion-label position="floating">{{"LOGIN.correct"|translate}}</ion-label>
-        <ion-input type="email" required formControlName="email"></ion-input>
+        <ion-input type="text" required formControlName="username"></ion-input>
       </ion-item>
-      <div *ngIf="(email.dirty || email.touched) && email.errors" class="errors">
+      <!-- <div *ngIf="(email.dirty || email.touched) && email.errors" class="errors">
         <span *ngIf="email.errors?.required">{{"LOGIN.mailrequired"|translate}}</span>
         <span *ngIf="email.errors?.email">{{"LOGIN.correct"|translate}}</span>
-      </div>
+      </div> -->
       <ion-item>
         <ion-label position="floating">{{"LOGIN.password"|translate}}</ion-label>
         <ion-input type="password" required formControlName="password"></ion-input>
@@ -39,7 +39,7 @@
      <ion-item (click)="openDataSecurityTextModal()" button class="securityText">
         <ion-icon name="analytics" slot="start"></ion-icon>
         <ion-label>{{"PRIVACY.policy" | translate}}</ion-label>
-        <ion-checkbox slot="end"  [checked]="dataSecurityAccepted" disabled="true" ></ion-checkbox>
+        <ion-checkbox slot="end"  [checked]="dataSecurityAccepted" disabled="true" formControlName="privacy"></ion-checkbox>
       </ion-item>
 
     </div>

@@ -2,8 +2,8 @@
     "LOGIN":{
         "login": "Anmelden",
         "username": "Benutzername",
-        "mailrequired": "E-Mail wird benötigt",
-        "correct": "Bitte richtige E-Mail Adresse eingeben",
+        "mailrequired": "Benutzername wird benötigt",
+        "correct": "Benutzernamen eingeben",
         "password": "Passwort",
         "pwrequired": "Passwort wird benötigt",
         "company": "Betrieb wählen",
