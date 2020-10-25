@@ -1,6 +1,7 @@
 {
     "LOGIN":{
         "login": "Login",
+        "username": "Username",
         "mailrequired": "E-Mail is necessary",
         "correct": "Please provide the correct e-mail",
         "password": "Password",
