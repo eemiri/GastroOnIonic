@@ -39,7 +39,7 @@
      <ion-item (click)="openDataSecurityTextModal()" button class="securityText">
         <ion-icon name="analytics" slot="start"></ion-icon>
         <ion-label>{{"PRIVACY.policy" | translate}}</ion-label>
-        <ion-checkbox slot="end"  [checked]="dataSecurityAccepted" disabled="true" formControlName="privacy"></ion-checkbox>
+        <ion-checkbox slot="end"  [checked]="dataSecurityAccepted" [attr.disabled]="true" formControlName="privacy"></ion-checkbox>
       </ion-item>
 
     </div>

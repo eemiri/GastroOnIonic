@@ -11,6 +11,7 @@ import { AppDatenschutzPage } from '../app-datenschutz/app-datenschutz/app-daten
 import { PasswortVergessenPage } from '../passwort-vergessen/passwort-vergessen/passwort-vergessen.page';
 import { DeviceInformation } from 'src/app/model/deviceInformation.model';
 import { UserData } from 'src/app/model/user-data';
+import { GlobalService } from 'src/app/services/global.service';
  
 @Component({
   selector: 'app-login',
@@ -37,7 +38,8 @@ export class LoginPage implements OnInit {
     private loadingController: LoadingController,
     private modalController: ModalController,
     private popoverCtrl: PopoverController,
-    private helperService: HelperService
+    private helperService: HelperService,
+    private globalService: GlobalService
   ) {}
     
   ngOnInit() {
@@ -45,12 +47,15 @@ export class LoginPage implements OnInit {
       username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
       privacy: ['', Validators.required]//vielleicht muss hier checked statt true
-    });
+    });    
+  }
+
+  ionViewWillenter(){
+
   }
  
   async login() {
-    
-
+    this.deviceInformation = this.globalService.getDeviceInformation();
     this.loginObj = new UserData(
       this.benutzername,
       this.betriebId,
@@ -64,11 +69,11 @@ export class LoginPage implements OnInit {
     const loading = await this.loadingController.create();
     await loading.present();
 
-
     if(this.credentials.valid){
       this.authService.login(this.loginObj).subscribe(//gewechselt von credentials zu loginobj
         async (res) => {
-          await loading.dismiss();        
+          await loading.dismiss();    
+          debugger;    
           this.router.navigateByUrl('/home', { replaceUrl: true });
         },
         async (res) => {
@@ -126,8 +131,7 @@ export class LoginPage implements OnInit {
         //cssClass: this.helperService.getModalOpts()
       });
 
-      // const {data} = await modal.onDidDismiss();
-      // this.dataSecurityAccepted = data;    
+   
       modal.onDidDismiss().then((confirmed) => {
         if (confirmed != null){
           this.dataSecurityAccepted = confirmed.data;
@@ -136,7 +140,7 @@ export class LoginPage implements OnInit {
       
       modal.present();
    // } else {
-      //this.dataSecurityAccepted = true; //nicht sicher ob ich das hier auskommentiert lassen kann, im büro testen
+      this.dataSecurityAccepted = true; //nicht sicher ob ich das hier auskommentiert lassen kann, im büro testen
     }
   }
 
