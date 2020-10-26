@@ -73,7 +73,6 @@ export class LoginPage implements OnInit {
       this.authService.login(this.loginObj).subscribe(//gewechselt von credentials zu loginobj
         async (res) => {
           await loading.dismiss();    
-          debugger;    
           this.router.navigateByUrl('/home', { replaceUrl: true });
         },
         async (res) => {

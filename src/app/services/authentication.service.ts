@@ -20,7 +20,7 @@ export class AuthenticationService {
   headers: HttpHeaders;
   
  
-  constructor(private http: HttpClient, private helperService: HelperService, ) {
+  constructor(private http: HttpClient, private helperService: HelperService) {
     this.loadToken();
     this.headers = this.helperService.getPostHeader();
   }
@@ -28,7 +28,7 @@ export class AuthenticationService {
   async loadToken() {
     const ret = await Storage.get({ key: TOKEN_KEY });    
     const token = JSON.parse(ret.value);
-    if (token && token.value) {
+    if (token){ //&& token.value) {
       this.token = token.value;
       this.isAuthenticated.next(true);
     } else {
@@ -49,7 +49,7 @@ export class AuthenticationService {
       switchMap(token => {//switch from original observable to a new observable
         return from(Storage.set({key: TOKEN_KEY, value: JSON.stringify({loginObj})}));//from transforms promise to observable
       }),
-      tap(_ => {
+      tap(_ => {//deprecated
         this.isAuthenticated.next(true);
       })
     )

@@ -55,37 +55,24 @@ async CheckScroll(event: any){
   if(this.scrollDepthTriggered) {
     return;
   }
-  if(isDevMode()){
-    console.log("Scroll:", event);
-  }
   if(event.target.localName != "ion-content") {
     // not sure if this is required, just playing it safe
     return;
   }
   const scrollElement = await event.target.getScrollElement();
-  if(isDevMode()){
-    console.log({scrollElement});
-  }
+
   // minus clientHeight because trigger is scrollTop
   // otherwise you hit the bottom of the page before 
   // the top screen can get to 80% total document height
   const scrollHeight = scrollElement.scrollHeight - scrollElement.clientHeight;
-  if(isDevMode()){
-    console.log({scrollHeight});
-  }
+
   const currentScrollDepth = event.detail.scrollTop;
-  if(isDevMode()){
-    console.log({currentScrollDepth});
-  }
+
   const targetPercent = 99;
   let triggerDepth = ((scrollHeight / 100) * targetPercent);
-  if(isDevMode()){
-    console.log({triggerDepth});
-  }
+
   if(currentScrollDepth > triggerDepth) {
-    if(isDevMode()){
-      console.log(`Scrolled to ${targetPercent}%`);
-    }
+    
     // this ensures that the event only triggers once
     this.scrollDepthTriggered = true;
     // do your analytics tracking here
