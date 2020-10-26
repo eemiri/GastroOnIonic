@@ -14,6 +14,12 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { LanguagePopoverPageModule } from './pages/language-popover/language-popover.module';
 
+import { environment } from '../environments/environment';
+ 
+import { AngularFireModule } from '@angular/fire';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
 }
@@ -28,8 +34,10 @@ export function createTranslateLoader(http: HttpClient) {
       deps: [HttpClient]
     }
   }),
-  LanguagePopoverPageModule
-
+      LanguagePopoverPageModule,
+      AngularFireModule.initializeApp(environment.firebase),
+      AngularFirestoreModule,
+      AngularFireAuthModule
 ],
   providers: [
     StatusBar,

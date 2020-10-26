@@ -39,6 +39,14 @@ const routes: Routes = [
     path: 'cal-modal',
     loadChildren: () => import('./pages/cal-modal/cal-modal.module').then( m => m.CalModalPageModule)
   },
+  {
+    path: 'auslieferungen',
+    loadChildren: () => import('./pages/auslieferungen/auslieferungen/auslieferungen.module').then( m => m.AuslieferungenPageModule)
+  },
+  {
+    path: 'auslieferer-map',
+    loadChildren: () => import('./pages/auslieferungen/auslieferungen/auslieferer-map/auslieferer-map.module').then( m => m.AusliefererMapPageModule)
+  },
 ];
 
 @NgModule({

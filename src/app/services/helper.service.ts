@@ -72,6 +72,18 @@ export class HelperService {
     toast.present();
   }
 
+  getShop4meUrl(action: string) {
+    if (isDevMode()) {
+      return (
+        "http://localhost:55275/umbraco/Shop4me/Shop4me_Surface/" +
+        action
+      );
+    }
+    return (
+      "https://www.hierbinichgast.de/umbraco/Shop4me/Shop4me_Surface/" + action
+    );
+  }
+
   // getModalOpts() {
   //   let theme: string = "";
 
