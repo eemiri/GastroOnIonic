@@ -6,6 +6,11 @@ const routes: Routes = [
   {
     path: '',
     component: HomePage,
+    children:[
+      { path: 'auslieferer-map',
+        loadChildren: '/pages/auslieferungen/auslieferungen/auslieferer-map/auslieferer-map.module#AusliefererMapPageRoutingModule'
+      }
+    ]
   }
 ];
 
