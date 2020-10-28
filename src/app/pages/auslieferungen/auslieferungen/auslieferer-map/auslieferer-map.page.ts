@@ -75,7 +75,7 @@ export class AusliefererMapPage {
  
     let mapOptions = {
       center: latLng,
-      zoom: 5,
+      zoom: 15,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
  
@@ -85,7 +85,7 @@ export class AusliefererMapPage {
   // Use Capacitor to track our geolocation
 startTracking() {
   this.isTracking = true;
-  this.watch = Geolocation.watchPosition({}, (position, err) => {
+  this.watch = Geolocation.watchPosition({}, (position, err) => {//see if i can change the timer to reduce batteryconsumption
     if (position) {
       this.addNewLocation(
         position.coords.latitude,
@@ -113,7 +113,7 @@ addNewLocation(lat, lng, timestamp) {
  
   let position = new google.maps.LatLng(lat, lng);
   this.map.setCenter(position);
-  this.map.setZoom(5);
+  this.map.setZoom(15);
 }
  
 // Delete a location from Firebase
