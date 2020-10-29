@@ -5,7 +5,6 @@
 </ion-header>
 
 <ion-content>
-  <ion-input id="pac-input" class="controls" type="text"></ion-input>
   <div #map id="map"></div>
 
   <div *ngIf="user">
@@ -22,11 +21,6 @@
     <ion-button expand="block" (click)="stopTracking()" *ngIf="isTracking">
       <ion-icon name="hand" slot="start"></ion-icon>
       Stop Tracking
-    </ion-button>
-
-    <ion-button expand="block" (click)="submit()">
-      <ion-icon name="navigate-outline"></ion-icon>
-      Submit
     </ion-button>
  
     <ion-list>
@@ -49,9 +43,6 @@
  
       </ion-item-sliding>
     </ion-list>
-    <div id="directions-panel"></div>
-
  
   </div>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9hWSUuSgn5WdzqE12L2gsFAkwAUoQC4c&libraries=places&callback=loadMap" async defer type="text/javascript"></script>
 </ion-content>

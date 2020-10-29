@@ -1,8 +1,7 @@
 {
   "name": "hbIGV3",
   "integrations": {
-    "capacitor": {},
-    "cordova": {}
+    "capacitor": {}
   },
   "type": "angular"
 }
