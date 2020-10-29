@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { AusliefererMapPageRoutingModule } from './auslieferer-map-routing.module';
 
 import { AusliefererMapPage } from './auslieferer-map.page';
+import { NativeGeocoder } from '@ionic-native/native-geocoder';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    AusliefererMapPageRoutingModule
+    AusliefererMapPageRoutingModule,
+    NativeGeocoder
   ],
   declarations: [AusliefererMapPage]
 })

@@ -24,10 +24,10 @@
       Stop Tracking
     </ion-button>
 
-    <ion-button expand="block" (click)="submit()">
+    <!-- <ion-button expand="block" (click)="submit()">
       <ion-icon name="navigate-outline"></ion-icon>
       Submit
-    </ion-button>
+    </ion-button> -->
  
     <ion-list>
       <ion-item-sliding *ngFor="let pos of locations | async">
@@ -53,5 +53,4 @@
 
  
   </div>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9hWSUuSgn5WdzqE12L2gsFAkwAUoQC4c&libraries=places&callback=loadMap" async defer type="text/javascript"></script>
 </ion-content>
