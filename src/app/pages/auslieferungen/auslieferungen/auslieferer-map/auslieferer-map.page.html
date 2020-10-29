@@ -7,8 +7,13 @@
 <ion-content>
   
   <div #map id="map"></div>
-  <!-- <ion-searchbar [(ngModel)]="autocomplete.input" (ionInput)="UpdateSearchResults()" placeholder="Search for a place"  (ionClear)="ClearAutocomplete()"></ion-searchbar> -->
-  <div *ngIf="user">
+   <ion-searchbar *ngIf="!loading" [(ngModel)]="autocomplete.input" (ionInput)="UpdateSearchResults()" placeholder="Search for a place"  (ionClear)="ClearAutocomplete()"></ion-searchbar>
+   <!-- <ion-list [hidden]="autocompleteItems.length == 0">
+    <ion-item *ngFor="let item of autocompleteItems" tappable (click)="SelectSearchResult(item)">
+      {{ item.description }}
+    </ion-item>
+  </ion-list> -->
+   <div *ngIf="user">
  
     <ion-item>
       <ion-label>User ID: {{ user.uid }}</ion-label>
