@@ -33,7 +33,6 @@
     "@types/googlemaps": "^3.40.3",
     "firebase": "^7.24.0",
     "ionic2-calendar": "^0.6.6",
-    "load-google-maps-api": "^2.0.2",
     "rxjs": "~6.5.5",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"

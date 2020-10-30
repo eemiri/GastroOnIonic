@@ -10,8 +10,6 @@ import { map } from 'rxjs/operators';
 import { Plugins } from '@capacitor/core';
 import { NativeGeocoder, NativeGeocoderOptions, NativeGeocoderResult } from '@ionic-native/native-geocoder/ngx';
 const { Geolocation } = Plugins;
-const loadGoogleMapsApi = require('load-google-maps-api');
-
  
 declare var google; //Problems with the google keyword
  
@@ -38,7 +36,6 @@ export class AusliefererMapPage {
   watch: string;
   user = null;
   placeid: any;
-  loading = true;
 
   //Searchbar
   autocomplete: { input: string; };
@@ -58,32 +55,17 @@ export class AusliefererMapPage {
  
   // Initialize a blank map
   loadMap() {
-    this.loading = true;
-    
-
     Geolocation.getCurrentPosition().then((resp) =>{
-      // 
-      
+      let latlng = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);//center of the map is the current position
+      let mapOptions = {
+        center: latlng,
+        zoom: 15,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
 
       //Load map with previous values as parameters
       this.getAddressFromCoords(resp.coords.latitude, resp.coords.longitude); 
-      //this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
-      loadGoogleMapsApi({
-        libraries: ['places'],
-        key: 'AIzaSyB9hWSUuSgn5WdzqE12L2gsFAkwAUoQC4c'
-      }).then((google)=>{
-        this.GoogleAutocomplete = new google.places.AutocompleteService();
-        this.autocomplete = { input: '' };
-        this.autocompleteItems = [];
-        let latlng = new google.LatLng(resp.coords.latitude, resp.coords.longitude);//center of the map is the current position
-        let mapOptions = {
-        center: latlng,
-        zoom: 15,
-        mapTypeId: google.MapTypeId.ROADMAP
-      };
-        this.map =  new google.Map(this.mapElement.nativeElement, mapOptions);
-        this.loading = false;
-      });
+      this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
       this.map.addListener('tilesLoaded', () =>{
         console.log('accuracy',this.map, this.map.center.lat());
         this.getAddressFromCoords(this.map.center.lat(), this.map.center.lng())
@@ -144,6 +126,7 @@ export class AusliefererMapPage {
     this.placeid = item.place_id
   }
 
+  //lET'S BE CLEAN! THIS WILL JUST CLEAN THE LIST WHEN WE CLOSE THE SEARCH BAR.
   ClearAutocomplete(){
     this.autocompleteItems = []
     this.autocomplete.input = ''
