@@ -36,9 +36,10 @@ export class AusliefererMapPage {
   watch: string;
   user = null;
   placeid: any;
+  loading = true;
+  adresse: string;
 
   //Searchbar
-  autocomplete: { input: string; };
   autocompleteItems: any[];
   GoogleAutocomplete: any;
   
@@ -55,6 +56,8 @@ export class AusliefererMapPage {
  
   // Initialize a blank map
   loadMap() {
+    this.loading = true;
+
     Geolocation.getCurrentPosition().then((resp) =>{
       let latlng = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);//center of the map is the current position
       let mapOptions = {
@@ -62,10 +65,82 @@ export class AusliefererMapPage {
         zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
-
+      
       //Load map with previous values as parameters
       this.getAddressFromCoords(resp.coords.latitude, resp.coords.longitude); 
       this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+      this.loading = false;
+
+      ///////Autocomplete
+      let input = document.getElementById("pac-input") as HTMLInputElement;
+      //this.adresse = input.value;
+
+      const autocompleteObj =  new google.maps.places.Autocomplete(input);//muss ein html input element sein
+      // Set the data fields to return when the user selects a place.
+      autocompleteObj.setFields(["address_components", "geometry", "icon", "name"]);
+      //Infowindow, hier könnte ich dann noch später Preis der bestellung anzeigen lassen
+      // const infowindow = new google.maps.InfoWindow();
+      // const infowindowContent = document.getElementById(
+      //   "infowindow-content"
+      // ) as HTMLElement;
+      // infowindow.setContent(infowindowContent);
+                              ////Marker bei dem ort
+                              // const marker = new google.maps.Marker({
+                              //   map,
+                              //   anchorPoint: new google.maps.Point(0, -29),
+                              // });
+    
+
+      autocompleteObj.addListener("place_changed", () =>{
+        //infowindow.close();
+        //marker.setVisible(false);
+        const place = autocompleteObj.getPlace();
+
+        if (!place.geometry) {
+          // User entered the name of a Place that was not suggested and
+          // pressed the Enter key, or the Place Details request failed.
+          window.alert("No details available for input: '" + place.name + "'");
+          return;
+        }
+    
+        if (place.geometry.viewport) {
+          this.map.fitBounds(place.geometry.viewport);
+        } else {
+          this.map.setCenter(place.geometry.location);
+          this.map.setZoom(16); 
+        }
+        // marker.setPosition(place.geometry.location);
+        // marker.setVisible(true);
+    
+        let address = "";
+
+        if (place.address_components) {
+          address = [
+            (place.address_components[0] &&
+              place.address_components[0].short_name) ||
+              "",
+            (place.address_components[1] &&
+              place.address_components[1].short_name) ||
+              "",
+            (place.address_components[2] &&
+              place.address_components[2].short_name) ||
+              "",
+          ].join(" ");
+        }
+
+        //Wieder für zukünftige Infowindows
+        // infowindowContent.children["place-icon"].src = place.icon;
+        // infowindowContent.children["place-name"].textContent = place.name;
+        // infowindowContent.children["place-address"].textContent = address;
+        // infowindow.open(map, marker);
+
+
+      });
+    
+
+
+      // this.loading = false;
+
       this.map.addListener('tilesLoaded', () =>{
         console.log('accuracy',this.map, this.map.center.lat());
         this.getAddressFromCoords(this.map.center.lat(), this.map.center.lng())
@@ -76,6 +151,7 @@ export class AusliefererMapPage {
       console.log('Error getting location', error);
     });
   }
+
 
   getAddressFromCoords(lattitude, longitude) {
     console.log("getAddressFromCoords "+lattitude+" "+longitude);
@@ -102,35 +178,37 @@ export class AusliefererMapPage {
       }); 
   }
 
-  //AUTOCOMPLETE, SIMPLY LOAD THE PLACE USING GOOGLE PREDICTIONS AND RETURNING THE ARRAY.
-  UpdateSearchResults(){
-    if (this.autocomplete.input == '') {
-      this.autocompleteItems = [];
-      return;
-    }
-    this.GoogleAutocomplete.getPlacePredictions({ input: this.autocomplete.input },
-    (predictions, status) => {
-      this.autocompleteItems = [];
-      this.zone.run(() => {
-        predictions.forEach((prediction) => {
-          this.autocompleteItems.push(prediction);
-        });
-      });
-    });
-  }
+  // //AUTOCOMPLETE, SIMPLY LOAD THE PLACE USING GOOGLE PREDICTIONS AND RETURNING THE ARRAY.
+  // UpdateSearchResults(){
+  //   if (this.autocomplete.input == '') {
+  //     this.autocompleteItems = [];
+  //     return;
+  //   }
+  //   this.GoogleAutocomplete.getPlacePredictions({ input: this.autocomplete.input },
+  //   (predictions, status) => {
+  //     this.autocompleteItems = [];
+  //     this.zone.run(() => {
+  //       predictions.forEach((prediction) => {
+  //         this.autocompleteItems.push(prediction);
+  //       });
+  //     });
+  //   });
+  // }
 
-  //WE CALL THIS FROM EACH ITEM.
-  SelectSearchResult(item) {
-    ///WE CAN CONFIGURE MORE COMPLEX FUNCTIONS SUCH AS UPLOAD DATA TO FIRESTORE OR LINK IT TO SOMETHING  ==================>>>> Noch anpassen für firebase
-    alert(JSON.stringify(item))      
-    this.placeid = item.place_id
-  }
+  // //WE CALL THIS FROM EACH ITEM.
+  // SelectSearchResult(item) {
+  //   ///WE CAN CONFIGURE MORE COMPLEX FUNCTIONS SUCH AS UPLOAD DATA TO FIRESTORE OR LINK IT TO SOMETHING  ==================>>>> Noch anpassen für firebase
+  //   alert(JSON.stringify(item))      
+  //   this.placeid = item.place_id
+  // }
 
-  //lET'S BE CLEAN! THIS WILL JUST CLEAN THE LIST WHEN WE CLOSE THE SEARCH BAR.
-  ClearAutocomplete(){
-    this.autocompleteItems = []
-    this.autocomplete.input = ''
-  }
+  // //lET'S BE CLEAN! THIS WILL JUST CLEAN THE LIST WHEN WE CLOSE THE SEARCH BAR.
+  // ClearAutocomplete(){
+  //   this.autocompleteItems = []
+  //   this.autocomplete.input = ''
+  // }
+
+  /////GOOGLEAUTOCOMPLETE/////
 
 
 ////////////////TRACKING//////////////////
