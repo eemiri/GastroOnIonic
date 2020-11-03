@@ -101,7 +101,7 @@ export class AusliefererMapPage implements OnInit {
           mapTypeId: google.maps.MapTypeId.ROADMAP,
         };
 
-        this.getAddressFromCoords(resp.coords.latitude, resp.coords.longitude);
+        //this.getAddressFromCoords(resp.coords.latitude, resp.coords.longitude);
         this.map = new google.maps.Map(
           this.mapElement.nativeElement,
           mapOptions
@@ -218,10 +218,11 @@ export class AusliefererMapPage implements OnInit {
   //#endregion
 
   calculateAndDisplayRoute() {
+    this.loading = true;
     this.directionsService.route(
       {
         origin: this.currentLatLng,// Geolocation.getCurrentPosition(),// this.getCurrentAddress(), //Betriebsadresse, placeholders
-        destination: this.currentLatLng ,//Geolocation.getCurrentPosition(),//this.getCurrentAddress(), //Betriebsadresse
+        destination: this.currentLatLng,//Geolocation.getCurrentPosition(),//this.getCurrentAddress(), //Betriebsadresse
         waypoints: this.waypointArray, //Möglichkeit finden die Eingegebenen Adressen hier rein zu pushen
         optimizeWaypoints: true,
         travelMode: google.maps.Travelmode.DRIVING,//hat mit dem rechten teil ein problem
@@ -231,7 +232,9 @@ export class AusliefererMapPage implements OnInit {
       },
       (response, status) => {
         if (status === "OK") {
+          this.loading = false;
           this.directionsRenderer.setDirections(response);
+          
         }
       }
     );

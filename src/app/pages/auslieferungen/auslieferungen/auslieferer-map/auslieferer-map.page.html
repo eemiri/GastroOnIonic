@@ -49,7 +49,7 @@
       </ion-item-sliding>
     </ion-list>    
     <ion-buttons>
-      <ion-button expand="block" (click)="calculateAndDisplayRoute()">
+      <ion-button *ngIf="!loading" expand="block" (click)="calculateAndDisplayRoute()">
         <ion-icon name="hand" slot="start"></ion-icon>
         Submit
       </ion-button>
