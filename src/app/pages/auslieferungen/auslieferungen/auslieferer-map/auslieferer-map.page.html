@@ -1,9 +1,9 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-searchbar [(ngModel)]="autocomplete.input" (ionInput)="UpdateSearchResults()" placeholder="Search for a place"  (ionClear)="ClearAutocomplete()"></ion-searchbar>
+    <ion-searchbar [(ngModel)]="autocomplete.input" (ionInput)="UpdateSearchResults()" placeholder="Search for a place"></ion-searchbar>
   </ion-toolbar>
   <ion-list [hidden]="autocompleteItems.length == 0">
-    <ion-item *ngFor="let item of autocompleteItems" tappable (click)="SelectSearchResult(item)">
+    <ion-item *ngFor="let item of autocompleteItems" tappable (click)="SelectSearchResult(item);ClearAutocomplete()">
       {{ item.description }}
     </ion-item>
   </ion-list>
@@ -49,13 +49,13 @@
       </ion-item-sliding>
     </ion-list>    
     <ion-buttons>
-      <ion-button *ngIf="!loading" expand="block" (click)="calculateAndDisplayRoute()">
+      <ion-button expand="block" (click)="calculateAndDisplayRoute()">
         <ion-icon name="hand" slot="start"></ion-icon>
         Submit
       </ion-button>
       <ion-button expand="block" (click)="ClearAutocomplete()">
         <ion-icon name="hand" slot="start"></ion-icon>
-        Delete
+        Clear
       </ion-button>
 
       <ion-button expand="block" (click)="startTracking()" *ngIf="!isTracking">

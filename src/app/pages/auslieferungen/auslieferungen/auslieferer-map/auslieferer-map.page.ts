@@ -147,7 +147,6 @@ export class AusliefererMapPage implements OnInit {
     this.nativeGeocoder
       .reverseGeocode(lattitude, longitude, options)
       .then((result: NativeGeocoderResult[]) => {
-        debugger;
         this.address = "";
         let responseAddress = [];
         for (let [key, value] of Object.entries(result[0])) {
@@ -218,29 +217,28 @@ export class AusliefererMapPage implements OnInit {
   //#endregion
 
   calculateAndDisplayRoute() {
-    this.loading = true;
     this.directionsService.route(
       {
         origin: this.currentLatLng,// Geolocation.getCurrentPosition(),// this.getCurrentAddress(), //Betriebsadresse, placeholders
         destination: this.currentLatLng,//Geolocation.getCurrentPosition(),//this.getCurrentAddress(), //Betriebsadresse
         waypoints: this.waypointArray, //Möglichkeit finden die Eingegebenen Adressen hier rein zu pushen
         optimizeWaypoints: true,
-        travelMode: google.maps.Travelmode.DRIVING,//hat mit dem rechten teil ein problem
+        travelMode: 'DRIVING',//google.maps.Travelmode.DRIVING,//hat mit dem rechten teil ein problem
         drivingOptions: {
           trafficModel: "pessimistic",
+          departureTime: new Date()
         },
       },
       (response, status) => {
         if (status === "OK") {
-          this.loading = false;
-          this.directionsRenderer.setDirections(response);
-          
+          this.directionsRenderer.setDirections(response);          
         }
       }
     );
-  } //Muss noch angepasst werden mit der ID vom Fahrer etc
+  } 
   //#endregion
   //#region tracking
+  //Muss noch angepasst werden mit der ID vom Fahrer etc
   // Perform an anonymous login and load data
   anonLogin() {
     this.afAuth.signInAnonymously().then((res) => {
