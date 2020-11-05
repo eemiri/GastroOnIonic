@@ -4,16 +4,16 @@
 
 export const environment = {
   production: false,
-  firebase: {
-    apiKey: "AIzaSyB9hWSUuSgn5WdzqE12L2gsFAkwAUoQC4c",
-    authDomain: "gastroonionic.firebaseapp.com",
-    databaseURL: "https://gastroonionic.firebaseio.com",
-    projectId: "gastroonionic",
-    storageBucket: "gastroonionic.appspot.com",
-    messagingSenderId: "163213775251",
-    appId: "1:163213775251:web:2119a8d09580e105819866",
-    measurementId: "G-4L5YT3ZBW0"
-  }
+  // firebase: {
+  //   apiKey: "AIzaSyB9hWSUuSgn5WdzqE12L2gsFAkwAUoQC4c",
+  //   authDomain: "gastroonionic.firebaseapp.com",
+  //   databaseURL: "https://gastroonionic.firebaseio.com",
+  //   projectId: "gastroonionic",
+  //   storageBucket: "gastroonionic.appspot.com",
+  //   messagingSenderId: "163213775251",
+  //   appId: "1:163213775251:web:2119a8d09580e105819866",
+  //   measurementId: "G-4L5YT3ZBW0"
+  // }
 };
 
 /*

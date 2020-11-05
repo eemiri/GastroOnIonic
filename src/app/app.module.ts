@@ -38,9 +38,6 @@ export function createTranslateLoader(http: HttpClient) {
     }
   }),
       LanguagePopoverPageModule,
-      AngularFireModule.initializeApp(environment.firebase),
-      AngularFirestoreModule,
-      AngularFireAuthModule,
 ],
   providers: [
     StatusBar,
