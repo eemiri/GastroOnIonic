@@ -75,13 +75,13 @@ export class AusliefererMapPage implements OnInit {
     //private geolocation: Geolocation,
     private nativeGeocoder: NativeGeocoder,
     public zone: NgZone,
-    private afAuth: AngularFireAuth,
-    private afs: AngularFirestore
+    // private afAuth: AngularFireAuth,
+    // private afs: AngularFirestore
   ) {
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: "" };
     this.autocompleteItems = [];
-    this.anonLogin();
+    //this.anonLogin();
   }
 
   ngOnInit() {
@@ -240,72 +240,72 @@ export class AusliefererMapPage implements OnInit {
   //#region tracking
   //Muss noch angepasst werden mit der ID vom Fahrer etc
   // Perform an anonymous login and load data
-  anonLogin() {
-    this.afAuth.signInAnonymously().then((res) => {
-      this.user = res.user;
-      this.locationsCollection = this.afs.collection(
-        `locations/${this.user.uid}/track`,
-        (ref) => ref.orderBy("timestamp")
-      ); // Make sure we also get the Firebase item ID!
-      this.locations = this.locationsCollection.snapshotChanges().pipe(
-        map((actions) =>
-          actions.map((a) => {
-            const data = a.payload.doc.data();
-            const id = a.payload.doc.id;
-            return { id, ...data };
-          })
-        )
-      ); // Update Map marker on every change
-      this.locations.subscribe((locations) => {
-        this.updateMap(locations);
-      });
-    });
-  } // Use Capacitor to track our geolocation
-  startTracking() {
-    this.isTracking = true;
-    this.watch = Geolocation.watchPosition({}, (position, err) => {
-      //see if i can change the timer to reduce batteryconsumption
-      if (position) {
-        this.addNewLocation(
-          position.coords.latitude,
-          position.coords.longitude,
-          position.timestamp
-        );
-      }
-    });
-  } // Unsubscribe from the geolocation watch using the initial ID
-  stopTracking() {
-    Geolocation.clearWatch({ id: this.watch }).then(() => {
-      this.isTracking = false;
-    });
-  } // Save a new location to Firebase and center the map
-  addNewLocation(lat, lng, timestamp) {
-    this.locationsCollection.add({
-      lat,
-      lng,
-      timestamp,
-    });
-    let position = new google.maps.LatLng(lat, lng);
-    this.map.setCenter(position);
-    this.map.setZoom(15);
-  } // Delete a location from Firebase
-  deleteLocation(pos) {
-    this.locationsCollection.doc(pos.id).delete();
-  } // Redraw all markers on the map
-  updateMap(locations) {
-    // Remove all current marker
-    this.markers.map((marker) => marker.setMap(null));
-    this.markers = [];
-    for (let loc of locations) {
-      let latLng = new google.maps.LatLng(loc.lat, loc.lng);
-      let marker = new google.maps.Marker({
-        map: this.map,
-        animation: google.maps.Animation.DROP,
-        position: latLng,
-      });
-      this.markers.push(marker);
-    }
-  }
+  // anonLogin() {
+  //   this.afAuth.signInAnonymously().then((res) => {
+  //     this.user = res.user;
+  //     this.locationsCollection = this.afs.collection(
+  //       `locations/${this.user.uid}/track`,
+  //       (ref) => ref.orderBy("timestamp")
+  //     ); // Make sure we also get the Firebase item ID!
+  //     this.locations = this.locationsCollection.snapshotChanges().pipe(
+  //       map((actions) =>
+  //         actions.map((a) => {
+  //           const data = a.payload.doc.data();
+  //           const id = a.payload.doc.id;
+  //           return { id, ...data };
+  //         })
+  //       )
+  //     ); // Update Map marker on every change
+  //     this.locations.subscribe((locations) => {
+  //       this.updateMap(locations);
+  //     });
+  //   });
+  // } // Use Capacitor to track our geolocation
+  // startTracking() {
+  //   this.isTracking = true;
+  //   this.watch = Geolocation.watchPosition({}, (position, err) => {
+  //     //see if i can change the timer to reduce batteryconsumption
+  //     if (position) {
+  //       this.addNewLocation(
+  //         position.coords.latitude,
+  //         position.coords.longitude,
+  //         position.timestamp
+  //       );
+  //     }
+  //   });
+  // } // Unsubscribe from the geolocation watch using the initial ID
+  // stopTracking() {
+  //   Geolocation.clearWatch({ id: this.watch }).then(() => {
+  //     this.isTracking = false;
+  //   });
+  // } // Save a new location to Firebase and center the map
+  // addNewLocation(lat, lng, timestamp) {
+  //   this.locationsCollection.add({
+  //     lat,
+  //     lng,
+  //     timestamp,
+  //   });
+  //   let position = new google.maps.LatLng(lat, lng);
+  //   this.map.setCenter(position);
+  //   this.map.setZoom(15);
+  // } // Delete a location from Firebase
+  // deleteLocation(pos) {
+  //   this.locationsCollection.doc(pos.id).delete();
+  // } // Redraw all markers on the map
+  // updateMap(locations) {
+  //   // Remove all current marker
+  //   this.markers.map((marker) => marker.setMap(null));
+  //   this.markers = [];
+  //   for (let loc of locations) {
+  //     let latLng = new google.maps.LatLng(loc.lat, loc.lng);
+  //     let marker = new google.maps.Marker({
+  //       map: this.map,
+  //       animation: google.maps.Animation.DROP,
+  //       position: latLng,
+  //     });
+  //     this.markers.push(marker);
+  //   }
+  // }
 
   //#endregion
 }
