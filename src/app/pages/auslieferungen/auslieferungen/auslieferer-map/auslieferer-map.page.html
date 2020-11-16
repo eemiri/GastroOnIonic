@@ -53,9 +53,13 @@
         <ion-icon name="hand" slot="start"></ion-icon>
         Submit
       </ion-button>
-      <ion-button expand="block" (click)="ClearAutocomplete()">
+      <ion-button expand="block" (click)="clearWaypoints()">
         <ion-icon name="hand" slot="start"></ion-icon>
-        Clear
+        Clear Waypoints
+      </ion-button>
+      <ion-button expand="block" (click)="launchnavigator()">
+        <ion-icon name="hand" slot="start"></ion-icon>
+        Launch Maps
       </ion-button>
 
       <ion-button expand="block" (click)="startTracking()" *ngIf="!isTracking">
@@ -69,10 +73,10 @@
       </ion-button>
       
     </ion-buttons>
-    <ion-item>
+    <!-- <ion-item>
       <ion-label>User ID: {{ user.uid }}</ion-label>
-    </ion-item>
-    <ion-list>
+    </ion-item> -->
+    <!-- <ion-list>
       <ion-item-sliding *ngFor="let pos of locations | async">
         <ion-item>
           <ion-label text-wrap>
@@ -87,7 +91,14 @@
           </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
-    </ion-list>   
+    </ion-list>    -->
+    <ion-list>
+      <ion-list-header>Previous Tracks</ion-list-header>
+      <ion-item *ngFor="let route of previousTracks">
+        {{ route.finished | date }}, {{ route.path.length }} Waypoints
+        <ion-button clear item-end (click)="showHistoryRoute(route.path)">View Route</ion-button>
+      </ion-item>
+    </ion-list>
   
 </div>
 </ion-content>

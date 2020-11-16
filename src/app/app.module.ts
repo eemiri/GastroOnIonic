@@ -13,15 +13,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { LanguagePopoverPageModule } from './pages/language-popover/language-popover.module';
-
-import { environment } from '../environments/environment';
  
-import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireAuthModule } from '@angular/fire/auth';
 import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
 //import { Geolocation } from '@capacitor/core';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -44,7 +40,8 @@ export function createTranslateLoader(http: HttpClient) {
     Geolocation,
     NativeGeocoder,
     SplashScreen,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    LaunchNavigator
   ],
   bootstrap: [AppComponent]
 })

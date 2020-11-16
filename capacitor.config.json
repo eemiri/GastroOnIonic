@@ -1,6 +1,6 @@
 {
   "appId": "io.ionic.starter",
-  "appName": "hbIGV3",
+  "appName": "GastroOnIonic",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",

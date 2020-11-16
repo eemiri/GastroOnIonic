@@ -15,11 +15,17 @@ import {
   AngularFirestore,
   AngularFirestoreCollection,
 } from "@angular/fire/firestore";
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { map } from "rxjs/operators";
 import { Plugins } from "@capacitor/core";
+import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator/ngx';
+
 const { Geolocation } = Plugins;
+const { Storage } = Plugins; //hier später durch die Datenbank ersetzen
+
+const TOKEN_ID = 'stopWatching';
+const TOKEN_KEY = 'routes';
 
 declare var google;
 
@@ -44,21 +50,31 @@ export class AusliefererMapPage implements OnInit {
   locations: Observable<any>;
   locationsCollection: AngularFirestoreCollection<any>;
 
-  // Map related
+  //#region MapVariables
   markers = [];
+  waypointString: string;
 
   waypointArray: google.maps.DirectionsWaypoint[] = [];
   waypointCollection: AngularFirestoreCollection<any>;
 
   directionsService = new google.maps.DirectionsService();
-  directionsRenderer = new google.maps.DirectionsRenderer();
+  directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
+  infowindow = new google.maps.InfoWindow();
+  //#endregion
 
-  // Misc
+  //#region MiscVariables
   isTracking = false;
   watch: string;
-  user = null;
+  user = true;
   loading = true;
   adresse: string;
+
+  trackedRoute = [];
+  previousTracks = [];
+
+  currentMapTrack = null;
+
+  positionSubscription: Subscription;
 
   currentAddress = Geolocation.getCurrentPosition().then((resp) => {
     this.getAddressFromCoords(resp.coords.latitude, resp.coords.longitude);
@@ -70,13 +86,14 @@ export class AusliefererMapPage implements OnInit {
       resp.coords.latitude,
       resp.coords.longitude
     );   });
-
+//#endregion
   constructor(
     //private geolocation: Geolocation,
     private nativeGeocoder: NativeGeocoder,
     public zone: NgZone,
     // private afAuth: AngularFireAuth,
-    // private afs: AngularFirestore
+    // private afs: AngularFirestore,
+    private ln: LaunchNavigator
   ) {
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: "" };
@@ -101,11 +118,11 @@ export class AusliefererMapPage implements OnInit {
           mapTypeId: google.maps.MapTypeId.ROADMAP,
         };
 
-        //this.getAddressFromCoords(resp.coords.latitude, resp.coords.longitude);
         this.map = new google.maps.Map(
           this.mapElement.nativeElement,
           mapOptions
         );
+
 
         //For Routing
         this.directionsRenderer.setMap(this.map);
@@ -125,7 +142,20 @@ export class AusliefererMapPage implements OnInit {
         console.log("Error getting location", error);
       });
   }
-
+  //#region Infowindow
+  placeMarker(response, context, text){
+    var marker = new google.maps.Marker({
+      position: response.start_location,
+      map: this.map
+    });
+    marker.addListener('click', function() {      
+      context.infowindow.close();//close previously opened infowindow
+      context.infowindow.setContent(text);      
+      context.infowindow.open(this.map, marker);      
+   });
+  }
+  
+  //#endregion
   //#region autocomplete
 
   getCurrentAddress() {
@@ -215,15 +245,15 @@ export class AusliefererMapPage implements OnInit {
   } //#region calcRoute
 
   //#endregion
-
+  //#region routeCalc
   calculateAndDisplayRoute() {
     this.directionsService.route(
       {
-        origin: this.currentLatLng,// Geolocation.getCurrentPosition(),// this.getCurrentAddress(), //Betriebsadresse, placeholders
-        destination: this.currentLatLng,//Geolocation.getCurrentPosition(),//this.getCurrentAddress(), //Betriebsadresse
-        waypoints: this.waypointArray, //Möglichkeit finden die Eingegebenen Adressen hier rein zu pushen
+        origin: this.currentLatLng,//Betriebsadresse, placeholders
+        destination: this.currentLatLng, //Betriebsadresse
+        waypoints: this.waypointArray, 
         optimizeWaypoints: true,
-        travelMode: 'DRIVING',//google.maps.Travelmode.DRIVING,//hat mit dem rechten teil ein problem
+        travelMode: 'DRIVING',
         drivingOptions: {
           trafficModel: "pessimistic",
           departureTime: new Date()
@@ -231,15 +261,108 @@ export class AusliefererMapPage implements OnInit {
       },
       (response, status) => {
         if (status === "OK") {
-          this.directionsRenderer.setDirections(response);          
+          this.directionsRenderer.setDirections(response);    
+      //     var my_route = response.routes[0];
+      //     for (var i = 1; i < my_route.legs.length; i++){
+      //       var marker = new google.maps.Marker({
+      //         position: my_route.legs[i].start_location,
+      //         map: this.map
+      //       });
+      //     }
+      //    marker.addListener('click', function() {
+      //     this.infowindow.close();//close previously opened infowindow
+      //     this.infowindow.setContent(`<div id="infowindow">${response.name}</div>`);
+      //     this.infowindow.open(this.map, marker);
+      //  });
+            // response.foreach(this.placeMarker);
+           // response.routes.legs.foreach(this.placeMarker);
+            var my_route = response.routes[0];
+            for (var i = 1; i < my_route.legs.length; i++){
+              var content = `<div id="infowindow">
+                                Time from previous stop ${my_route.legs[i].duration.text}
+                                
+                            </div>`;
+              this.placeMarker(my_route.legs[i], this, content);
+              
+            }
         }
       }
     );
+  }
+
+  
+
+  clearWaypoints(){  
+    let i = 0;
+    while(i<this.waypointArray.length){
+      this.deleteWaypoint(i);
+    }
   } 
   //#endregion
   //#region tracking
-  //Muss noch angepasst werden mit der ID vom Fahrer etc
-  // Perform an anonymous login and load data
+  // Muss noch angepasst werden mit der ID vom Fahrer etc
+
+  async loadHistoricRoutes() {
+    // this.storage.get('routes').then(data => { //Aus der Datenbank machen
+    //   if (data) {
+    //     this.previousTracks = data;
+    //   }
+    // });
+    const ret = await Storage.get({ key: TOKEN_KEY });    
+    const prevRoutes = JSON.parse(ret.value);
+    if(prevRoutes){
+      this.previousTracks = prevRoutes;
+    }
+  }
+
+  startTracking() {
+    this.isTracking = true;
+    this.trackedRoute = [];
+      
+      this.watch = Geolocation.watchPosition({}, (position, err) =>{
+        if(position){
+          this.trackedRoute.push({ lat: position.coords.latitude, lng: position.coords.longitude });
+          this.redrawPath(this.trackedRoute);
+        }
+      });
+  }
+
+    stopTracking() {
+      let newRoute = { finished: new Date().getTime(), path: this.trackedRoute };
+      this.previousTracks.push(newRoute);
+      Storage.set({key: TOKEN_KEY, value: JSON.stringify(this.previousTracks)});//Datenbank
+     
+      this.isTracking = false;
+      Geolocation.clearWatch({id: TOKEN_ID});
+      this.currentMapTrack.setMap(null);
+    }
+     
+    showHistoryRoute(route) {
+      this.redrawPath(route);
+    }
+ 
+  redrawPath(path) {
+    if (this.currentMapTrack) {
+      this.currentMapTrack.setMap(null);
+    }
+ 
+    if (path.length > 1) {
+      this.currentMapTrack = new google.maps.Polyline({
+        path: path,
+        geodesic: true,
+        strokeColor: '#ff00ff',
+        strokeOpacity: 1.0,
+        strokeWeight: 3
+      });
+      this.currentMapTrack.setMap(this.map);
+    }
+  }
+
+
+
+
+
+  //  Perform an anonymous login and load data
   // anonLogin() {
   //   this.afAuth.signInAnonymously().then((res) => {
   //     this.user = res.user;
@@ -260,7 +383,8 @@ export class AusliefererMapPage implements OnInit {
   //       this.updateMap(locations);
   //     });
   //   });
-  // } // Use Capacitor to track our geolocation
+  // } 
+  // Use Capacitor to track our geolocation
   // startTracking() {
   //   this.isTracking = true;
   //   this.watch = Geolocation.watchPosition({}, (position, err) => {
@@ -307,5 +431,23 @@ export class AusliefererMapPage implements OnInit {
   //   }
   // }
 
+  //#endregion
+  //#region MapsLaunch
+  createWaypointString(){
+    for(let i = 0; i < this.waypointArray.length; i++){
+      if(i<this.waypointArray.length){
+        this.waypointString = this.waypointArray[i].toString() + "+to:";
+      }
+      else{
+        this.waypointString = this.waypointArray[i].toString();
+      }
+    }
+  }
+
+  launchnavigator(){
+    this.ln.navigate(this.waypointString,{
+      start: "Vorstadtstraße 57, 66117 Saarbrücken"//adresse vom betrieb
+    });    
+  }
   //#endregion
 }
