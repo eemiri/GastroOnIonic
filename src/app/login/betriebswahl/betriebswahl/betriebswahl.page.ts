@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Plugins } from '@capacitor/core';
 import { LoadingController, ModalController } from '@ionic/angular';
 import { Betrieb } from 'src/app/model/betrieb.model';
 import { HelperService } from 'src/app/services/helper.service';
 import { LoginService } from 'src/app/services/login.service';
+
+const { Storage } = Plugins;
 
 
 @Component({
@@ -101,7 +104,14 @@ export class BetriebswahlPage implements OnInit {
   }
 
   async setBetrieb(betrieb: Betrieb) {
+   var strasse = betrieb.Strasse; 
+   var ort = betrieb.Ort
+   var location = strasse + ", " + ort;
+   
+   Storage.set({key: 'BetriebsLocation', value: location});
    await this.closeModal(betrieb);
+   debugger;
+   
   }
 
   async closeModal(betrieb: Betrieb) {

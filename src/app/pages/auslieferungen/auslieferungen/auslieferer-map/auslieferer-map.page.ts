@@ -66,6 +66,7 @@ export class AusliefererMapPage implements OnInit {
   isTracking = false;
   watch: string;
   user = true;
+  //username = Storage.get({ key: 'username' });
   loading = true;
   adresse: string;
 
@@ -88,17 +89,13 @@ export class AusliefererMapPage implements OnInit {
     );   });
 //#endregion
   constructor(
-    //private geolocation: Geolocation,
     private nativeGeocoder: NativeGeocoder,
     public zone: NgZone,
-    // private afAuth: AngularFireAuth,
-    // private afs: AngularFirestore,
     private ln: LaunchNavigator
   ) {
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: "" };
     this.autocompleteItems = [];
-    //this.anonLogin();
   }
 
   ngOnInit() {
@@ -242,15 +239,14 @@ export class AusliefererMapPage implements OnInit {
     return (window.location.href =
       "https://www.google.com/maps/search/?api=1&query=Google&query_place_id=" +
       this.placeid);
-  } //#region calcRoute
-
-  //#endregion
+  } 
   //#region routeCalc
-  calculateAndDisplayRoute() {
+  async calculateAndDisplayRoute() {
+    const ret = await Storage.get({ key: 'BetriebsLocation' });    
     this.directionsService.route(
       {
-        origin: this.currentLatLng,//Betriebsadresse, placeholders
-        destination: this.currentLatLng, //Betriebsadresse
+        origin: ret.value,//Betriebsadresse, placeholders
+        destination: ret.value, //Betriebsadresse
         waypoints: this.waypointArray, 
         optimizeWaypoints: true,
         travelMode: 'DRIVING',
@@ -279,12 +275,13 @@ export class AusliefererMapPage implements OnInit {
             var my_route = response.routes[0];
             for (var i = 1; i < my_route.legs.length; i++){
               var content = `<div id="infowindow">
-                                Time from previous stop ${my_route.legs[i].duration.text}
-                                
+                                Geschätzte Dauer ab dem letzten Stop ${my_route.legs[i].duration.text}
+
                             </div>`;
               this.placeMarker(my_route.legs[i], this, content);
               
             }
+            
         }
       }
     );
