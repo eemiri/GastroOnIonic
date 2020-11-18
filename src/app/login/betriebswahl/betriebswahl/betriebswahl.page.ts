@@ -109,9 +109,8 @@ export class BetriebswahlPage implements OnInit {
    var location = strasse + ", " + ort;
    
    Storage.set({key: 'BetriebsLocation', value: location});
-   await this.closeModal(betrieb);
-   debugger;
-   
+   Storage.set({key: 'BetriebsID', value: JSON.stringify(betrieb.Id)});
+   await this.closeModal(betrieb);   
   }
 
   async closeModal(betrieb: Betrieb) {

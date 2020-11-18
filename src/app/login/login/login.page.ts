@@ -65,12 +65,12 @@ export class LoginPage implements OnInit {
       this.deviceInformation.DeviceToken,
       this.deviceInformation.Platform
     );
-    
+
     const loading = await this.loadingController.create();
     await loading.present();
 
     if(this.credentials.valid){
-      this.authService.login(this.loginObj).subscribe(//gewechselt von credentials zu loginobj
+      this.authService.login(this.loginObj).subscribe(
         async (res) => {
           await loading.dismiss();    
           this.router.navigateByUrl('/home', { replaceUrl: true });
