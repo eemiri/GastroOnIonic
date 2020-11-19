@@ -20,6 +20,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
 import { map } from "rxjs/operators";
 import { Plugins } from "@capacitor/core";
 import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator/ngx';
+import { AuslieferungenService } from 'src/app/services/auslieferungen.service';
 
 const { Geolocation } = Plugins;
 const { Storage } = Plugins; //hier später durch die Datenbank ersetzen
@@ -91,7 +92,8 @@ export class AusliefererMapPage implements OnInit {
   constructor(
     private nativeGeocoder: NativeGeocoder,
     public zone: NgZone,
-    private ln: LaunchNavigator
+    private ln: LaunchNavigator,
+    private ausliefererService: AuslieferungenService
   ) {
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: "" };
@@ -100,6 +102,11 @@ export class AusliefererMapPage implements OnInit {
 
   ngOnInit() {
     this.loadMap();
+  }
+
+  async getBusinessAddress(){
+    var address =  await Storage.get({ key: 'BetriebsLocation' }); 
+    return address.value;
   }
 
   loadMap() {
@@ -142,13 +149,13 @@ export class AusliefererMapPage implements OnInit {
   //#region Infowindow
   placeMarker(response, context, text){
     var marker = new google.maps.Marker({
-      position: response.start_location,
+      position: response.end_location,
       map: this.map
     });
     marker.addListener('click', function() {      
       context.infowindow.close();//close previously opened infowindow
       context.infowindow.setContent(text);      
-      context.infowindow.open(this.map, marker);      
+      context.infowindow.open(context.map, marker);      
    });
   }
   
@@ -213,9 +220,7 @@ export class AusliefererMapPage implements OnInit {
       }
     );
   }
-
   SelectSearchResult(item) {
-    //alert(JSON.stringify(item));
     this.placeid = item.place_id;
     this.waypointArray.push({
       location: item.description,
@@ -243,13 +248,24 @@ export class AusliefererMapPage implements OnInit {
   //#endregion
   //#region routeCalc
   async calculateAndDisplayRoute() {
-    const ret = await Storage.get({ key: 'BetriebsLocation' });    
+    this.waypointArray=[];
+
+    ///////////test mit hardcodewaypoints später nochmal ändern
+    for(var i = 0; i<this.ausliefererService.preorderList.length; i++){
+      this.waypointArray.push({
+        location: this.ausliefererService.preorderList[i].DeliveryAddressData,
+        stopover: true,      
+      });
+    }    
+    var context = this;
+    const address = await this.getBusinessAddress();
+    console.log(this.waypointArray);
     this.directionsService.route(
       {
-        origin: ret.value,//Betriebsadresse, placeholders
-        destination: ret.value, //Betriebsadresse
+        origin: address,//Betriebsadresse, placeholders
+        destination: address, //Betriebsadresse
         waypoints: this.waypointArray, 
-        optimizeWaypoints: true,
+        optimizeWaypoints: false,
         travelMode: 'DRIVING',
         drivingOptions: {
           trafficModel: "pessimistic",
@@ -258,28 +274,27 @@ export class AusliefererMapPage implements OnInit {
       },
       (response, status) => {
         if (status === "OK") {
-          this.directionsRenderer.setDirections(response);    
-      //     var my_route = response.routes[0];
-      //     for (var i = 1; i < my_route.legs.length; i++){
-      //       var marker = new google.maps.Marker({
-      //         position: my_route.legs[i].start_location,
-      //         map: this.map
-      //       });
-      //     }
-      //    marker.addListener('click', function() {
-      //     this.infowindow.close();//close previously opened infowindow
-      //     this.infowindow.setContent(`<div id="infowindow">${response.name}</div>`);
-      //     this.infowindow.open(this.map, marker);
-      //  });
-            // response.foreach(this.placeMarker);
-           // response.routes.legs.foreach(this.placeMarker);
+          this.directionsRenderer.setDirections(response);  
             var my_route = response.routes[0];
-            for (var i = 1; i < my_route.legs.length; i++){
+            console.log(my_route);
+            for (var i = 0; i < my_route.legs.length; i++){//Man fängt bei 1 an damit man eine infowindow/marker beim betrieb hat
+              // if(i == 0){
+              //   var content = `<div id="infowindow">
+              //                   Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
+              //                   Name: ${this.ausliefererService.preorderList[i].CustomerData}<br>
+              //                   Preis: ${this.ausliefererService.preorderList[i].TotalPrice}€<br>
+              //                   Kommentar: ${this.ausliefererService.preorderList[i].CustomerMessage}
+              //               </div>`;
+              //               this.placeMarker(my_route.legs[i], this, content);
+              // }
+              
               var content = `<div id="infowindow">
-                                Geschätzte Dauer ab dem letzten Stop ${my_route.legs[i].duration.text}
-
+                                Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
+                                Name: ${context.ausliefererService.preorderList[i].CustomerData}<br>
+                                Preis: ${context.ausliefererService.preorderList[i].TotalPrice}€<br>
+                                Kommentar: ${context.ausliefererService.preorderList[i].CustomerMessage}
                             </div>`;
-              this.placeMarker(my_route.legs[i], this, content);
+                            context.placeMarker(my_route.legs[i], context, content);
               
             }
             

@@ -1,12 +1,23 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Plugins } from '@capacitor/core';
 import { Observable } from 'rxjs';
+import { UserData } from '../model/user-data';
 import { HelperService } from './helper.service';
+const { Storage } = Plugins;
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuslieferungenService {
+  preorderList:any =[
+    {PreorderID:1, Status: 4, TotalPrice: 10.99, DeliveryAddressData: 'Riegelsbergerstraße 45, 66113 Saarbrücken', CustomerData: 'Günther Jauch', CustomerMessage: '1riegelsberger millionär'},
+    {PreorderID:2, Status: 4, TotalPrice: 8.55, DeliveryAddressData: 'Saargemünderstraße 45, 66271 Kleinblittersdorf', CustomerData: 'Alexander Marcus', CustomerMessage: '2saargemünder yeah boiii'},
+    {PreorderID:3, Status: 4, TotalPrice: 23.34, DeliveryAddressData: 'Jenneweg 12, 66113 Saarbrücken', CustomerData: 'babaji', CustomerMessage: '3jenne besser oben als unten'}
+  ];
+
+  preOrderIds: Array<number>
+  userdata: UserData
 
   headers: HttpHeaders;
 
@@ -48,5 +59,54 @@ export class AuslieferungenService {
       { headers: this.headers }
     );
   }
-  
+  async preOrderList(){//kriegt alle bestellungen, periodisch refreshen
+    const ret = await Storage.get({ key: 'BetriebsID' });    
+    const id = JSON.parse(ret.value);
+    setTimeout(() =>{//noch einen Fall einbauen wo der call nicht funktioniert
+      this.getPreOrders(id).subscribe( (res) =>{
+        this.preorderList = [];
+        this.preorderList = JSON.parse(res.Data)
+    });
+    }, 10000);
+  }
+
+  setPreorderToDriver(status: number){
+    this.preOrderIds = [];
+    for(const preorder of this.preorderList){
+      this.preOrderIds.push(preorder.PreorderID)
+    }
+    this.setPreOrderToUser(this.preOrderIds, this.userdata.benutzer_id, status).subscribe(responseData => {
+      this.preorderList.splice(
+        this.preorderList.findIndex(
+          order => order.PreorderID == responseData.Data.PreorderID
+        ),
+        1,
+        responseData.Data
+      );
+    });
+  }
+
+  getPreorderAddress(preorderID){
+    this.preorderList.find(order => order.PreorderID == preorderID).subscribe(responseData =>{
+      return responseData.DeliveryAddressData;
+    });
+  }
+
+  getPreorderPrice(preorderID){
+    this.preorderList.find(order => order.PreorderID == preorderID).subscribe(responseData =>{
+      return responseData.TotalPrice;
+    });
+  }
+
+  getPreorderMessage(preorderID){
+    this.preorderList.find(order => order.PreorderID == preorderID).subscribe(responseData =>{
+      return responseData.CustomerMessage;
+    });
+  }
+
+  getPreorderCustomer(preorderID){
+    this.preorderList.find(order => order.PreorderID == preorderID).subscribe(responseData =>{
+      return responseData.CustomerData;
+    });
+  }
 }

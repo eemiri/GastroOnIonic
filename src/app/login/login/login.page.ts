@@ -26,6 +26,7 @@ export class LoginPage implements OnInit {
   betrieb: string = "";
   betriebId: number = -1;
   benutzername: string = "";
+  benutzer_id: number;
   passwort: string = "";
   dataSecurityAccepted: boolean = false;
 
@@ -65,6 +66,7 @@ export class LoginPage implements OnInit {
       this.deviceInformation.DeviceToken,
       this.deviceInformation.Platform
     );
+    this.loginObj.setAdditionalUserDataInformation
 
     const loading = await this.loadingController.create();
     await loading.present();
