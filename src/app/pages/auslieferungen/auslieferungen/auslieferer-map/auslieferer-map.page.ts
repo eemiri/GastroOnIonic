@@ -265,7 +265,7 @@ export class AusliefererMapPage implements OnInit {
         origin: address,//Betriebsadresse, placeholders
         destination: address, //Betriebsadresse
         waypoints: this.waypointArray, 
-        optimizeWaypoints: false,
+        optimizeWaypoints: true,
         travelMode: 'DRIVING',
         drivingOptions: {
           trafficModel: "pessimistic",
@@ -275,9 +275,11 @@ export class AusliefererMapPage implements OnInit {
       (response, status) => {
         if (status === "OK") {
           this.directionsRenderer.setDirections(response);  
+          console.log(this.waypointArray);
             var my_route = response.routes[0];
-            console.log(my_route);
-            for (var i = 0; i < my_route.legs.length; i++){//Man fängt bei 1 an damit man eine infowindow/marker beim betrieb hat
+            
+            for (var i = 0; i < my_route.legs.length; i++){
+              
               // if(i == 0){
               //   var content = `<div id="infowindow">
               //                   Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
@@ -288,13 +290,27 @@ export class AusliefererMapPage implements OnInit {
               //               this.placeMarker(my_route.legs[i], this, content);
               // }
               
-              var content = `<div id="infowindow">
-                                Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
-                                Name: ${context.ausliefererService.preorderList[i].CustomerData}<br>
-                                Preis: ${context.ausliefererService.preorderList[i].TotalPrice}€<br>
-                                Kommentar: ${context.ausliefererService.preorderList[i].CustomerMessage}
-                            </div>`;
-                            context.placeMarker(my_route.legs[i], context, content);
+              // var content = `<div id="infowindow">
+              //                   Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
+              //                   Name: ${context.ausliefererService.preorderList[i].CustomerData}<br>
+              //                   Preis: ${context.ausliefererService.preorderList[i].TotalPrice}€<br>
+              //                   Kommentar: ${context.ausliefererService.preorderList[i].CustomerMessage}
+              //               </div>`;
+              //               context.placeMarker(my_route.legs[i], context, content);
+              console.log(my_route.legs[i].end_address);
+                  for(var j = 0; j<context.ausliefererService.preorderList.length; j++){
+                    
+                    if(my_route.legs[i].end_address.substring(0,3) === context.ausliefererService.preorderList[j].DeliveryAddressData.substring(0,3)){//weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
+                      var content = `<div id="infowindow">
+                        Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
+                        Name: ${context.ausliefererService.preorderList[j].CustomerData}<br>
+                        Preis: ${context.ausliefererService.preorderList[j].TotalPrice}€<br>
+                        Kommentar: ${context.ausliefererService.preorderList[j].CustomerMessage}
+                        </div>`;
+                      context.placeMarker(my_route.legs[i], context, content);
+                      
+                    }
+                  }
               
             }
             
