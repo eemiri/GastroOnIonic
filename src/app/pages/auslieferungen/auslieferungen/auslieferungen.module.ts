@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { AuslieferungenPageRoutingModule } from './auslieferungen-routing.module';
 
 import { AuslieferungenPage } from './auslieferungen.page';
+import { AusliefererMapPageModule } from './auslieferer-map/auslieferer-map.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    AuslieferungenPageRoutingModule
+    AuslieferungenPageRoutingModule,
+    AusliefererMapPageModule
   ],
   declarations: [AuslieferungenPage]
 })

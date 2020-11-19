@@ -9,6 +9,9 @@ const routes: Routes = [
     children:[
       { path: 'auslieferer-map',
         loadChildren: '/pages/auslieferungen/auslieferungen/auslieferer-map/auslieferer-map.module#AusliefererMapPageRoutingModule'
+      },
+      { path: 'auslieferungen',
+        loadChildren: '/pages/auslieferungen/auslieferungen/auslieferungen.module#AuslieferungenPageModule'        
       }
     ]
   }

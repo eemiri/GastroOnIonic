@@ -62,32 +62,7 @@ export class AuslieferungenService {
       { headers: this.headers }
     );
   }
-  async preOrderList(){//kriegt alle bestellungen, periodisch refreshen
-    const ret = await Storage.get({ key: 'BetriebsID' });    
-    const id = JSON.parse(ret.value);
-    setTimeout(() =>{//noch einen Fall einbauen wo der call nicht funktioniert
-      this.getPreOrders(id).subscribe( (res) =>{
-        this.preorderList = [];
-        this.preorderList = JSON.parse(res.Data)
-    });
-    }, 10000);
-  }
-
-  setPreorderToDriver(status: number){
-    this.preOrderIds = [];
-    for(const preorder of this.preorderList){
-      this.preOrderIds.push(preorder.PreorderID)
-    }
-    this.setPreOrderToUser(this.preOrderIds, this.userdata.benutzer_id, status).subscribe(responseData => {
-      this.preorderList.splice(
-        this.preorderList.findIndex(
-          order => order.PreorderID == responseData.Data.PreorderID
-        ),
-        1,
-        responseData.Data
-      );
-    });
-  }
+  
 
   getPreorderAddress(preorderID){
     this.preorderList.find(order => order.PreorderID == preorderID).subscribe(responseData =>{

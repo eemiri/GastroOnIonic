@@ -16,8 +16,6 @@ import {
   AngularFirestoreCollection,
 } from "@angular/fire/firestore";
 import { Observable, Subscription } from "rxjs";
-import { AngularFireAuth } from "@angular/fire/auth";
-import { map } from "rxjs/operators";
 import { Plugins } from "@capacitor/core";
 import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator/ngx';
 import { AuslieferungenService } from 'src/app/services/auslieferungen.service';
@@ -275,29 +273,10 @@ export class AusliefererMapPage implements OnInit {
       (response, status) => {
         if (status === "OK") {
           this.directionsRenderer.setDirections(response);  
-          console.log(this.waypointArray);
             var my_route = response.routes[0];
             
             for (var i = 0; i < my_route.legs.length; i++){
-              
-              // if(i == 0){
-              //   var content = `<div id="infowindow">
-              //                   Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
-              //                   Name: ${this.ausliefererService.preorderList[i].CustomerData}<br>
-              //                   Preis: ${this.ausliefererService.preorderList[i].TotalPrice}€<br>
-              //                   Kommentar: ${this.ausliefererService.preorderList[i].CustomerMessage}
-              //               </div>`;
-              //               this.placeMarker(my_route.legs[i], this, content);
-              // }
-              
-              // var content = `<div id="infowindow">
-              //                   Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
-              //                   Name: ${context.ausliefererService.preorderList[i].CustomerData}<br>
-              //                   Preis: ${context.ausliefererService.preorderList[i].TotalPrice}€<br>
-              //                   Kommentar: ${context.ausliefererService.preorderList[i].CustomerMessage}
-              //               </div>`;
-              //               context.placeMarker(my_route.legs[i], context, content);
-              console.log(my_route.legs[i].end_address);
+
                   for(var j = 0; j<context.ausliefererService.preorderList.length; j++){
                     
                     if(my_route.legs[i].end_address.substring(0,3) === context.ausliefererService.preorderList[j].DeliveryAddressData.substring(0,3)){//weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
@@ -307,6 +286,7 @@ export class AusliefererMapPage implements OnInit {
                         Preis: ${context.ausliefererService.preorderList[j].TotalPrice}€<br>
                         Kommentar: ${context.ausliefererService.preorderList[j].CustomerMessage}
                         </div>`;
+                        ///////In das div muss noch der anruf/SMS-Button für den kunden
                       context.placeMarker(my_route.legs[i], context, content);
                       
                     }
