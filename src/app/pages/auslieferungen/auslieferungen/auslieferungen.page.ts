@@ -31,7 +31,7 @@ export class AuslieferungenPage implements OnInit {
   ngOnInit() {
   }
     
-  async preOrderList(){//kriegt alle bestellungen, periodisch refreshen
+  async getPreOrderList(){//kriegt alle bestellungen, periodisch refreshen
     const ret = await Storage.get({ key: 'BetriebsID' });    
     const id = JSON.parse(ret.value);
     setTimeout(() =>{//noch einen Fall einbauen wo der call nicht funktioniert
@@ -75,12 +75,26 @@ export class AuslieferungenPage implements OnInit {
   // }
 
   async openMapModal(){
-    debugger;
     const mapModal = await this.modalCtrl.create({
-      component: AusliefererMapPage
-    });   
+      component: AusliefererMapPage,
+      componentProps:{
+        'liste': this.preorderList
+      }
+    });
+    this.preorderList=[];   
+
+    mapModal.onDidDismiss().then((dataReturned)=>{
+      if(dataReturned !== null){
+        this.claimedList = dataReturned['data'];
+      }
+    });
+
     return await mapModal.present();
   }
+
+  // receiveList($event){
+  //   this.claimedList = $event;
+  // }
 
   
 }

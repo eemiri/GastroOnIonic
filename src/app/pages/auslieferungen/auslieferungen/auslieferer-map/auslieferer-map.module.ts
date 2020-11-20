@@ -15,6 +15,6 @@ import { AusliefererMapPage } from './auslieferer-map.page';
     IonicModule,
     AusliefererMapPageRoutingModule
   ],
-  //declarations: [AusliefererMapPage]
+  declarations: [AusliefererMapPage]
 })
 export class AusliefererMapPageModule {}

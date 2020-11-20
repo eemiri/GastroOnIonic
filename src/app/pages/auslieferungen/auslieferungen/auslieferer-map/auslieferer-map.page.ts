@@ -4,6 +4,9 @@ import {
   ViewChild,
   ElementRef,
   NgZone,
+  Input,
+  Output,
+  EventEmitter,
 } from "@angular/core";
 //import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {
@@ -19,6 +22,7 @@ import { Observable, Subscription } from "rxjs";
 import { Plugins } from "@capacitor/core";
 import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator/ngx';
 import { AuslieferungenService } from 'src/app/services/auslieferungen.service';
+import { ModalController, NavParams } from '@ionic/angular';
 
 const { Geolocation } = Plugins;
 const { Storage } = Plugins; //hier später durch die Datenbank ersetzen
@@ -66,7 +70,6 @@ export class AusliefererMapPage implements OnInit {
   watch: string;
   user = true;
   //username = Storage.get({ key: 'username' });
-  loading = true;
   adresse: string;
 
   trackedRoute = [];
@@ -86,22 +89,31 @@ export class AusliefererMapPage implements OnInit {
       resp.coords.latitude,
       resp.coords.longitude
     );   });
+
+    //@Input() preorderList:any;
+    preorderList = this.navParams.get('liste');
+
+    @Output() preListEvent = new EventEmitter();
 //#endregion
   constructor(
     private nativeGeocoder: NativeGeocoder,
     public zone: NgZone,
     private ln: LaunchNavigator,
-    private ausliefererService: AuslieferungenService
+    private ausliefererService: AuslieferungenService,
+    private modalCtrl: ModalController,
+
+    private navParams: NavParams
   ) {
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: "" };
     this.autocompleteItems = [];
   }
-
   ngOnInit() {
     this.loadMap();
+    
   }
 
+  
   async getBusinessAddress(){
     var address =  await Storage.get({ key: 'BetriebsLocation' }); 
     return address.value;
@@ -129,16 +141,17 @@ export class AusliefererMapPage implements OnInit {
         //For Routing
         this.directionsRenderer.setMap(this.map);
 
-        this.map.addListener("tilesloaded", () => {
-          //listens to map-movements
-          console.log("accuracy", this.map, this.map.center.lat());
-          this.getAddressFromCoords(
-            this.map.center.lat(),
-            this.map.center.lng()
-          );
-          this.lat = this.map.center.lat();
-          this.long = this.map.center.lng();
-        });
+        // this.map.addListener("tilesloaded", () => {
+        //   //listens to map-movements
+        //   console.log("accuracy", this.map, this.map.center.lat());
+        //   this.getAddressFromCoords(
+        //     this.map.center.lat(),
+        //     this.map.center.lng()
+        //   );
+        //   this.lat = this.map.center.lat();
+        //   this.long = this.map.center.lng();
+        // });
+        this.calculateAndDisplayRoute();
       })
       .catch((error) => {
         console.log("Error getting location", error);
@@ -150,13 +163,25 @@ export class AusliefererMapPage implements OnInit {
       position: response.end_location,
       map: this.map
     });
+    
+    // debugger;
     marker.addListener('click', function() {      
       context.infowindow.close();//close previously opened infowindow
       context.infowindow.setContent(text);      
       context.infowindow.open(context.map, marker);      
    });
+   this.markers.push(marker);
   }
   
+  reloadMarkers(routeLegsArray, context, contentArray){
+    for(var i = 0; i< this.markers.length; i++){
+      this.markers[i].setMap(null);
+    }
+    for(var j = 0; i< this.markers.length; j++){
+      this.placeMarker(routeLegsArray[j], context, contentArray[i])
+    }
+  }
+
   //#endregion
   //#region autocomplete
 
@@ -246,18 +271,22 @@ export class AusliefererMapPage implements OnInit {
   //#endregion
   //#region routeCalc
   async calculateAndDisplayRoute() {
+    this.markers = [];
     this.waypointArray=[];
-
-    ///////////test mit hardcodewaypoints später nochmal ändern
-    for(var i = 0; i<this.ausliefererService.preorderList.length; i++){
-      this.waypointArray.push({
-        location: this.ausliefererService.preorderList[i].DeliveryAddressData,
-        stopover: true,      
-      });
-    }    
+    // var routeLegsArray;
+    // var contentArray;    
     var context = this;
     const address = await this.getBusinessAddress();
-    console.log(this.waypointArray);
+
+    ///////////test mit hardcodewaypoints später nochmal ändern
+    for(var i = 0; i<this.preorderList.length; i++){
+      this.waypointArray.push({
+        location: this.preorderList[i].DeliveryAddressData,
+        stopover: true,      
+      });
+    }
+    
+  
     this.directionsService.route(
       {
         origin: address,//Betriebsadresse, placeholders
@@ -277,26 +306,31 @@ export class AusliefererMapPage implements OnInit {
             
             for (var i = 0; i < my_route.legs.length; i++){
 
-                  for(var j = 0; j<context.ausliefererService.preorderList.length; j++){
+                  for(var j = 0; j<context.preorderList.length; j++){
                     
-                    if(my_route.legs[i].end_address.substring(0,3) === context.ausliefererService.preorderList[j].DeliveryAddressData.substring(0,3)){//weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
+                    if(my_route.legs[i].end_address.substring(0,3) === context.preorderList[j].DeliveryAddressData.substring(0,3)){//weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
                       var content = `<div id="infowindow">
                         Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
-                        Name: ${context.ausliefererService.preorderList[j].CustomerData}<br>
-                        Preis: ${context.ausliefererService.preorderList[j].TotalPrice}€<br>
-                        Kommentar: ${context.ausliefererService.preorderList[j].CustomerMessage}
+                        Name: ${context.preorderList[j].CustomerData}<br>
+                        Preis: ${context.preorderList[j].TotalPrice}€<br>
+                        Kommentar: ${context.preorderList[j].CustomerMessage}
                         </div>`;
                         ///////In das div muss noch der anruf/SMS-Button für den kunden
                       context.placeMarker(my_route.legs[i], context, content);
-                      
+                      // contentArray.push(content);
+                      // routeLegsArray.push(my_route.legs[i])
                     }
                   }
               
             }
             
         }
+        //google.maps.event.trigger(this.map, 'resize');
       }
     );
+    
+    // this.reloadMarkers(routeLegsArray, context, contentArray);
+    // debugger;
   }
 
   
@@ -453,10 +487,16 @@ export class AusliefererMapPage implements OnInit {
     }
   }
 
-  launchnavigator(){
+  async launchnavigator(){
+    const address = await this.getBusinessAddress();
     this.ln.navigate(this.waypointString,{
-      start: "Vorstadtstraße 57, 66117 Saarbrücken"//adresse vom betrieb
+      start: address//adresse vom betrieb
     });    
   }
   //#endregion
+
+  abbruch(){
+    this.preListEvent.emit(this.preorderList);
+    this.modalCtrl.dismiss(this.preorderList);
+  }
 }
