@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Fahrtenübersicht</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-list>
+          Im Moment noch preorderlist, später eine ganze fahrt
+          <ion-item *ngFor="let preorder of preorderList" >            
+              <ion-label text-wrap (click)="openDetails(preorder)">
+                {{ preorder.CustomerData }} |
+                {{ preorder.DeliveryAddressData }} |
+                {{ preorder.Status}}
+              </ion-label>
+          </ion-item>
+        </ion-list> 
+      </ion-col>     
+    </ion-row>
+    <ion-row>
+      <ion-col>
+       Gesamtübersicht: <br>
+       Gesamtumsatz<br>
+        Wie viele Fahrten<br>
+        Wie viele Kunden(Waypoints)<br>
+        (Vl gefahrene strecke)
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+ 
+
+  
+</ion-content>

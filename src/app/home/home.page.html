@@ -35,10 +35,10 @@
     <ion-button (click)="openBetriebeModal()">
       <ion-icon name="bookmark" slot="icon-only"></ion-icon>
     </ion-button>
-    <ion-button routerLink="/auslieferer-map">
+    <!-- <ion-button routerLink="/auslieferer-map">
       <ion-icon name="map-outline"></ion-icon>
-    </ion-button>
-    <ion-button routerLink="/ausliefererungen">
+    </ion-button> -->
+    <ion-button [routerLink]="['/ausliefererungen']">
       <ion-icon name="car-outline"></ion-icon>
     </ion-button>
   </ion-buttons>

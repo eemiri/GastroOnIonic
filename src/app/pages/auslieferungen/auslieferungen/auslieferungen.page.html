@@ -14,8 +14,9 @@
             <ion-item>
               
               <ion-label text-wrap>
-                {{ preorder.CustomerData }}
-                {{ preorder.DeliveryAddressData }}
+                {{ preorder.CustomerData }} |
+                {{ preorder.DeliveryAddressData }} |
+                {{ preorder.Status}}
               </ion-label>
             </ion-item>
       
@@ -34,8 +35,9 @@
             <ion-item>
               
               <ion-label text-wrap>
-                {{ claimed.CustomerData }}
-                {{ claimed.DeliveryAddressData }}
+                {{ claimed.CustomerData }} |
+                {{ claimed.DeliveryAddressData }} |
+                {{ claimed.Status}}
               </ion-label>
             </ion-item>
       
@@ -50,8 +52,9 @@
     </ion-row>
     <ion-row>
       <ion-col>
-        Overview
-
+        <ion-button [routerLink]="['/overview']">
+          Overview
+        </ion-button>        
       </ion-col>
       <ion-col>
         <ion-button (click)="openMapModal()">

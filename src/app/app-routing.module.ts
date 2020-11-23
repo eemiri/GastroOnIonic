@@ -47,6 +47,10 @@ const routes: Routes = [
     path: 'auslieferer-map',
     loadChildren: () => import('./pages/auslieferungen/auslieferungen/auslieferer-map/auslieferer-map.module').then( m => m.AusliefererMapPageModule)
   },
+  {
+    path: 'overview',
+    loadChildren: () => import('./pages/auslieferungen/overview/overview.module').then( m => m.OverviewPageModule)
+  },
 ];
 
 @NgModule({

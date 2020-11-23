@@ -7,6 +7,7 @@ import {
   Input,
   Output,
   EventEmitter,
+  HostListener,
 } from "@angular/core";
 //import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {
@@ -110,8 +111,19 @@ export class AusliefererMapPage implements OnInit {
   }
   ngOnInit() {
     this.loadMap();
-    
+    const modalState = {
+      modal : true,
+      desc : 'fake state for our modal'//damit der user nicht eine seite zurück geht wenn er auf dem Modal den Hardware-Back-Button drückt
+    };
+    history.pushState(modalState, null);
   }
+
+  ngOnDestroy() {
+    if (window.history.state.modal) {
+      history.back();
+    }
+  }
+
 
   
   async getBusinessAddress(){
@@ -158,29 +170,56 @@ export class AusliefererMapPage implements OnInit {
       });
   }
   //#region Infowindow
-  placeMarker(response, context, text){
-    var marker = new google.maps.Marker({
-      position: response.end_location,
-      map: this.map
-    });
+  async placeMarker(response, context, text){
+    // if(response == response.legs[0]){
+    //   var marker = new google.maps.Marker({
+    //     position: response.start_location,
+    //     label: 'H',
+    //     map: this.map
+    //   });
+
+    //   marker.addListener('click', function() {      
+    //     context.infowindow.close();//close previously opened infowindow
+    //     context.infowindow.setContent(text);      
+    //     context.infowindow.open(context.map, marker);      
+    //  });
+    //  this.markers.push(marker);
+    // }else{
+      const startAddress = await this.getBusinessAddress();
+      if(response.start_address.substring(0,3) === startAddress.substring(0,3)){
+        var startmarker = new google.maps.Marker({
+          position: response.start_location,
+          icon:{
+            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+          },
+          map: this.map
+        });
+      }
+      var marker = new google.maps.Marker({
+        position: response.end_location,
+        map: this.map
+      });
+      marker.addListener('click', function() {      
+        context.infowindow.close();//close previously opened infowindow
+        context.infowindow.setContent(text);      
+        context.infowindow.open(context.map, marker);      
+     });
+     
+     //this.markers.push(marker);
+    //}
     
-    // debugger;
-    marker.addListener('click', function() {      
-      context.infowindow.close();//close previously opened infowindow
-      context.infowindow.setContent(text);      
-      context.infowindow.open(context.map, marker);      
-   });
-   this.markers.push(marker);
   }
   
-  reloadMarkers(routeLegsArray, context, contentArray){
-    for(var i = 0; i< this.markers.length; i++){
-      this.markers[i].setMap(null);
-    }
-    for(var j = 0; i< this.markers.length; j++){
-      this.placeMarker(routeLegsArray[j], context, contentArray[i])
-    }
-  }
+  // reloadMarkers(routeLegsArray, context, contentArray){
+  //   for(var i = 0; i< this.markers.length; i++){
+  //     this.markers[i].setMap(null);
+  //   }
+  //   for(var j = 0; i< this.markers.length; j++){
+  //     this.placeMarker(routeLegsArray[j], context, contentArray[i])
+  //   }
+  // }
+
+  
 
   //#endregion
   //#region autocomplete
@@ -310,6 +349,7 @@ export class AusliefererMapPage implements OnInit {
                     
                     if(my_route.legs[i].end_address.substring(0,3) === context.preorderList[j].DeliveryAddressData.substring(0,3)){//weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
                       var content = `<div id="infowindow">
+                        Das ist Stop ${[i+1]} <br>
                         Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
                         Name: ${context.preorderList[j].CustomerData}<br>
                         Preis: ${context.preorderList[j].TotalPrice}€<br>
@@ -491,12 +531,25 @@ export class AusliefererMapPage implements OnInit {
     const address = await this.getBusinessAddress();
     this.ln.navigate(this.waypointString,{
       start: address//adresse vom betrieb
-    });    
+    });  
+    for (var i = 0; i<this.preorderList.length; i++){
+      this.preorderList[i].Status = 4;
+    }  
   }
   //#endregion
-
+  @HostListener('window:popstate', ['$event'])
   abbruch(){
     this.preListEvent.emit(this.preorderList);
     this.modalCtrl.dismiss(this.preorderList);
+  }
+
+  fahrtBeendet(){
+    for(var i = 0; i<this.preorderList.length; i++){
+      this.preorderList[i].Status = 5;
+    }
+    this.preListEvent.emit(this.preorderList);
+    this.modalCtrl.dismiss(this.preorderList);
+
+    ////////////////Hier noch implementieren dass nichts in die claimedlist kommt sondern direkt in die datenbank geladen wird
   }
 }

@@ -33,12 +33,12 @@
     </ion-list>     -->
     <ion-buttons>
       
-      <ion-button expand="block" (click)="launchnavigator();startTracking()">
+      <ion-button expand="block" (click)="startTracking()"*ngIf="!isTracking"> <!--Hier noch launchnavigator-->
         <ion-icon name="hand" slot="start"></ion-icon>
         Fahrt Beginnen
       </ion-button>
 
-      <ion-button expand="block" (click)="stopTracking()" *ngIf="isTracking">
+      <ion-button expand="block" (click)="fahrtBeendet()" *ngIf="isTracking"> <!--hier noch stoptracking-->
         <ion-icon name="hand" slot="start"></ion-icon>
         Fahrt Beendet
       </ion-button>
