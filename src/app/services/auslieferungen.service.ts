@@ -15,6 +15,8 @@ export class AuslieferungenService {
   userdata: UserData
 
   headers: HttpHeaders;
+  drivenRoutes = new Array<Array<any>>();
+  numOfRoutes = [];
 
   constructor(public http: HttpClient, private helperService: HelperService) {
     this.headers = this.helperService.getPostHeader();

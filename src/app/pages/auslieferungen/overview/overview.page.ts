@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { AuslieferungenService } from 'src/app/services/auslieferungen.service';
+import { AusliefererMapPage } from '../auslieferungen/auslieferer-map/auslieferer-map.page';
+import { OverviewMapPage } from '../overview-map/overview-map.page';
 
 @Component({
   selector: 'app-overview',
@@ -6,21 +10,30 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./overview.page.scss'],
 })
 export class OverviewPage implements OnInit {
-  preorderList:any =[
-    {PreorderID:1, Status: 4, TotalPrice: 10.99, DeliveryAddressData: 'Riegelsbergerstraße 45, 66113 Saarbrücken', CustomerData: 'Günther Jauch', CustomerMessage: '1riegelsberger millionär'},
-    {PreorderID:2, Status: 4, TotalPrice: 8.55, DeliveryAddressData: 'Saargemünderstraße 45, 66271 Kleinblittersdorf', CustomerData: 'Alexander Marcus', CustomerMessage: '2saargemünder yeah boiii'},
-    {PreorderID:3, Status: 4, TotalPrice: 23.34, DeliveryAddressData: 'Jenneweg 12, 66113 Saarbrücken', CustomerData: 'babaji', CustomerMessage: '3jenne besser oben als unten'},
-    {PreorderID:3, Status: 4, TotalPrice: 23.34, DeliveryAddressData: 'Malstatterstraße 1, 66117 Saarbrücken', CustomerData: 'maalstatt', CustomerMessage: 'peace'},
-    {PreorderID:3, Status: 4, TotalPrice: 23.34, DeliveryAddressData: 'Mainzerstraße 171, 66121 Saarbrücken', CustomerData: 'mainzer', CustomerMessage: 'hotel, trivago'},
-    {PreorderID:3, Status: 4, TotalPrice: 23.34, DeliveryAddressData: 'Europaallee 14, 66113 Saarbrücken', CustomerData: 'Europa', CustomerMessage: 'apo'}
-  ];
+  drivenRoutes: any;
+  timeStamps = [];
 
-  constructor() { }
+  constructor(public lieferungen: AuslieferungenService, public modalCtrl: ModalController) { }
+  
 
   ngOnInit() {
+    this.drivenRoutes = this.lieferungen.drivenRoutes;
+    for (var i = 0; i<this.drivenRoutes.length; i++){
+      this.timeStamps.push(this.drivenRoutes[i][0]);
+    }
+    console.log(this.timeStamps);
   }
 
-  openDetails(preorder){
-    
+  async openMapModal(i){
+    const mapModal = await this.modalCtrl.create({
+      component: OverviewMapPage,
+      componentProps:{
+        'drivenList': this.drivenRoutes[i].shift()
+      },
+      backdropDismiss: false      
+    }); 
+    debugger;
+    console.log(this.drivenRoutes[i]);
+    return await mapModal.present();
   }
 }

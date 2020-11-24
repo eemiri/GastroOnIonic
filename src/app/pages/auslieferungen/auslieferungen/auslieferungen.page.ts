@@ -22,10 +22,17 @@ export class AuslieferungenPage implements OnInit {
     {PreorderID:3, Status: 3, TotalPrice: 23.34, DeliveryAddressData: 'Jenneweg 12, 66113 Saarbrücken', CustomerData: 'babaji', CustomerMessage: '3jenne besser oben als unten'},
     {PreorderID:3, Status: 3, TotalPrice: 23.34, DeliveryAddressData: 'Malstatterstraße 1, 66117 Saarbrücken', CustomerData: 'maalstatt', CustomerMessage: 'peace'},
     {PreorderID:3, Status: 2, TotalPrice: 23.34, DeliveryAddressData: 'Mainzerstraße 171, 66121 Saarbrücken', CustomerData: 'mainzer', CustomerMessage: 'hotel, trivago'},
-    {PreorderID:3, Status: 2, TotalPrice: 23.34, DeliveryAddressData: 'Europaallee 14, 66113 Saarbrücken', CustomerData: 'Europa', CustomerMessage: 'apo'}
+    {PreorderID:3, Status: 2, TotalPrice: 23.34, DeliveryAddressData: 'Europaallee 14, 66113 Saarbrücken', CustomerData: 'Europa', CustomerMessage: 'apo'},
+    
+    {PreorderID:1, Status: 3, TotalPrice: 10.99, DeliveryAddressData: 'St. Ingberter Str. 46, 66123 Saarbrücken', CustomerData: 'Biggie Smalls', CustomerMessage: 'I love it when they call me big poppa'},
+    {PreorderID:2, Status: 3, TotalPrice: 8.55, DeliveryAddressData: 'Neugrabenweg 8, 66123 Saarbrücken', CustomerData: 'Sweet Dee', CustomerMessage: 'Bird'},
+    {PreorderID:3, Status: 3, TotalPrice: 23.34, DeliveryAddressData: 'Am Kieselhumes 4, 66121 Saarbrücken', CustomerData: 'MR Bombastik', CustomerMessage: 'Nippel aus Plastik'},
+    {PreorderID:3, Status: 3, TotalPrice: 23.34, DeliveryAddressData: 'Egon-Reinert Straße 1, 66111 Saarbrücken', CustomerData: 'EGON', CustomerMessage: '3 ist die Zahl'},
+    {PreorderID:3, Status: 3, TotalPrice: 23.34, DeliveryAddressData: 'Dudweilerstraße 71, 66123 Saarbrücken', CustomerData: 'dudi', CustomerMessage: 'bubi'},
+    {PreorderID:3, Status: 3, TotalPrice: 23.34, DeliveryAddressData: 'Schloßstraße 50, 66117 Saarbrücken', CustomerData: 'Schlossi', CustomerMessage: 'bossi'}
   ];
   claimedList: any = [];
-  drivenRoutes: any;
+  //drivenRoutes = new Array<Array<any>>();
   
   constructor(private lieferungen: AuslieferungenService, public modalCtrl: ModalController, public alertController: AlertController) { }
 
@@ -107,9 +114,11 @@ export class AuslieferungenPage implements OnInit {
       this.claimedList = dataReturned['data'];      
     }
     if(this.claimedList.some(e => e.Status === 5)){
-      this.drivenRoutes.push(this.claimedList);
+      this.claimedList.unshift(new Date().toLocaleTimeString());
+      this.lieferungen.drivenRoutes.push(this.claimedList);
       this.claimedList = []
-      console.log(this.drivenRoutes);
+      console.log(this.lieferungen.drivenRoutes);
+      //this.lieferungen.numOfRoutes.push("")
     }
   });
 

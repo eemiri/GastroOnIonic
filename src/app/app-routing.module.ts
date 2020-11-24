@@ -51,6 +51,10 @@ const routes: Routes = [
     path: 'overview',
     loadChildren: () => import('./pages/auslieferungen/overview/overview.module').then( m => m.OverviewPageModule)
   },
+  {
+    path: 'overview-map',
+    loadChildren: () => import('./pages/auslieferungen/overview-map/overview-map.module').then( m => m.OverviewMapPageModule)
+  },
 ];
 
 @NgModule({

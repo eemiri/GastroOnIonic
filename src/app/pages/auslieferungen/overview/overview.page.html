@@ -9,13 +9,9 @@
     <ion-row>
       <ion-col>
         <ion-list>
-          Im Moment noch preorderlist, später eine ganze fahrt
-          <ion-item *ngFor="let preorder of preorderList" >            
-              <ion-label text-wrap (click)="openDetails(preorder)">
-                {{ preorder.CustomerData }} |
-                {{ preorder.DeliveryAddressData }} |
-                {{ preorder.Status}}
-              </ion-label>
+          Vergangene Fahrten
+          <ion-item *ngFor="let timestamp of timeStamps; let i = index" (click)="openMapModal(i)" >                   
+            Fahrt beendet um {{timestamp}}
           </ion-item>
         </ion-list> 
       </ion-col>     
