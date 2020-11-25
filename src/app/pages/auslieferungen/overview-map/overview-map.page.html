@@ -4,5 +4,21 @@
 <ion-content> 
  
   <div #map id="map"  style="height: 60%;" ></div>
- 
+  <!-- <ion-col no-lines> -->
+    <ion-item id="sum" lines="none">
+      Gesamtumsatz: {{totalSum}} € bei {{preorderList.length-1}} Lieferungen   
+    </ion-item>     
+  <!-- </ion-col> -->
+  <ion-col>
+    <ion-list>
+      Fahrtabschnitte:
+      <ion-item *ngFor="let preorder of preorderList | slice:1; let i = index" >      
+          <ion-label text-wrap>
+            {{ preorder.CustomerData }} |
+            {{ preorder.DeliveryAddressData }} |
+            {{ preorder.TotalPrice}} €
+          </ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-col>
 </ion-content>

@@ -328,7 +328,7 @@ export class AusliefererMapPage implements OnInit {
   
     this.directionsService.route(
       {
-        origin: address,//Betriebsadresse, placeholders
+        origin: address,//Betriebsadresse
         destination: address, //Betriebsadresse
         waypoints: this.waypointArray, 
         optimizeWaypoints: true,

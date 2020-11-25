@@ -72,6 +72,8 @@ export class OverviewMapPage implements OnInit {
   
     positionSubscription: Subscription;
 
+    totalSum: number;
+
   
     currentLatLng = Geolocation.getCurrentPosition()
     .then((resp) => {
@@ -81,7 +83,7 @@ export class OverviewMapPage implements OnInit {
       );   });
   
       //@Input() preorderList:any;
-      preorderList = this.navParams.get('liste');
+      preorderList = this.navParams.get('drivenList');
   
       @Output() preListEvent = new EventEmitter();
   //#endregion
@@ -137,8 +139,6 @@ export class OverviewMapPage implements OnInit {
             this.mapElement.nativeElement,
             mapOptions
           );
-  
-
           this.directionsRenderer.setMap(this.map);
 
           this.calculateAndDisplayRoute();
@@ -172,7 +172,7 @@ export class OverviewMapPage implements OnInit {
     }
   
     //#endregion
-    //#region autocomplete
+
   
 
     
@@ -182,27 +182,28 @@ export class OverviewMapPage implements OnInit {
       this.waypointArray.splice(wayptIndex, 1);
     }
 
-    //#endregion
+
     //#region routeCalc
     async calculateAndDisplayRoute() {
-      this.markers = [];
       this.waypointArray=[];
       // var routeLegsArray;
       // var contentArray;    
       var context = this;
       const address = await this.getBusinessAddress();
+      this.totalSum = 0;
   
       ///////////test mit hardcodewaypoints später nochmal ändern
-      for(var i = 0; i<this.preorderList.length; i++){
+      for(var i = 1; i<this.preorderList.length; i++){
         this.waypointArray.push({
           location: this.preorderList[i].DeliveryAddressData,
           stopover: true,      
         });
-      }      
-    
+        this.totalSum = this.totalSum + this.preorderList[i].TotalPrice;
+      }
+         
       this.directionsService.route(
         {
-          origin: address,//Betriebsadresse, placeholders
+          origin: address,//Betriebsadresse
           destination: address, //Betriebsadresse
           waypoints: this.waypointArray, 
           optimizeWaypoints: true,
@@ -219,7 +220,7 @@ export class OverviewMapPage implements OnInit {
               
               for (var i = 0; i < my_route.legs.length; i++){
   
-                    for(var j = 0; j<context.preorderList.length; j++){
+                    for(var j = 1; j<context.preorderList.length; j++){////Hier j auf 1 und <= gemacht, nur zur erinnerung
                       
                       if(my_route.legs[i].end_address.substring(0,3) === context.preorderList[j].DeliveryAddressData.substring(0,3)){//weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
                         var content = `<div id="infowindow">
