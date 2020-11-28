@@ -59,7 +59,7 @@ export class AuslieferungenPage implements OnInit {
   setPreorderToDriver(status: number){
     this.preOrderIds = [];
     for(const preorder of this.preorderList){
-      this.preOrderIds.push(preorder.PreorderID)
+      this.preOrderIds.push(preorder.PreorderID)//erstelle hier eine liste von allen perorderID's
     }
     this.lieferungen.setPreOrderToUser(this.preOrderIds, this.userdata.benutzer_id, status).subscribe(responseData => {
       this.preorderList.splice(
@@ -72,6 +72,14 @@ export class AuslieferungenPage implements OnInit {
       //this.claimedList.push(responseData.Data);
     });
   }
+
+  savePreOrderStatus(order, status) {
+    this.lieferungen
+      .savePreOrderStatus(order.PreorderID, status)
+      .subscribe(response => {
+        this.getPreOrderList();
+      });
+  } 
 
   claimPreorder(preorder){
     if(preorder.Status === 3){
