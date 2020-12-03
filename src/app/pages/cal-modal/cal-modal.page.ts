@@ -55,7 +55,6 @@ export class CalModalPage implements AfterViewInit {
  
   save() {       
     this.modalCtrl.dismiss({event: this.event}); 
-    debugger;
     this.resetEvent();   
   }
  

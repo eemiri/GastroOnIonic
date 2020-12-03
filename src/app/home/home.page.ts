@@ -227,7 +227,6 @@ async openCalModal() {
   await modal.present();
  
   modal.onDidDismiss().then((result) => {
-    debugger;
     if (result.data && result.data.event) {      
       let event = result.data.event;
       if (event.allDay) {//hier anpassen wenn man spezifische uhrzeiten will, bzw untendrunter die stunden und minuten noch eingeben

@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { AusliefererMapPageRoutingModule } from './auslieferer-map-routing.module';
 
 import { AusliefererMapPage } from './auslieferer-map.page';
+import { FahrerKommentarPageModule } from '../fahrer-kommentar/fahrer-kommentar.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    AusliefererMapPageRoutingModule
+    AusliefererMapPageRoutingModule,
+    FahrerKommentarPageModule
   ],
   declarations: [AusliefererMapPage]
 })

@@ -9,27 +9,29 @@ import {
   EventEmitter,
   HostListener,
 } from "@angular/core";
-//import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {
   NativeGeocoder,
   NativeGeocoderResult,
   NativeGeocoderOptions,
 } from "@ionic-native/native-geocoder/ngx";
-import {
-  AngularFirestore,
-  AngularFirestoreCollection,
-} from "@angular/fire/firestore";
+// import {
+//   AngularFirestore,
+//   AngularFirestoreCollection,
+// } from "@angular/fire/firestore";
 import { Observable, Subscription } from "rxjs";
 import { Plugins } from "@capacitor/core";
-import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator/ngx';
-import { AuslieferungenService } from 'src/app/services/auslieferungen.service';
-import { ModalController, NavParams } from '@ionic/angular';
+import {
+  LaunchNavigator,
+} from "@ionic-native/launch-navigator/ngx";
+import { AuslieferungenService } from "src/app/services/auslieferungen.service";
+import { ModalController, NavParams } from "@ionic/angular";
+import { FahrerKommentarPage } from '../fahrer-kommentar/fahrer-kommentar.page';
 
 const { Geolocation } = Plugins;
 const { Storage } = Plugins; //hier später durch die Datenbank ersetzen
 
-const TOKEN_ID = 'stopWatching';
-const TOKEN_KEY = 'routes';
+const TOKEN_ID = "stopWatching";
+const TOKEN_KEY = "routes";
 
 declare var google;
 
@@ -49,20 +51,23 @@ export class AusliefererMapPage implements OnInit {
   location: any;
   placeid: any;
   GoogleAutocomplete: any;
+  commentArray: Array<any> = [];
 
   // Firebase Data
   locations: Observable<any>;
-  locationsCollection: AngularFirestoreCollection<any>;
+  //locationsCollection: AngularFirestoreCollection<any>;
 
   //#region MapVariables
   markers = [];
   waypointString: string;
 
   waypointArray: google.maps.DirectionsWaypoint[] = [];
-  waypointCollection: AngularFirestoreCollection<any>;
+  additionalWaypoints: google.maps.DirectionsWaypoint[] = [];
 
   directionsService = new google.maps.DirectionsService();
-  directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    suppressMarkers: true,
+  });
   infowindow = new google.maps.InfoWindow();
   //#endregion
 
@@ -84,23 +89,23 @@ export class AusliefererMapPage implements OnInit {
     this.getAddressFromCoords(resp.coords.latitude, resp.coords.longitude);
   });
 
-  currentLatLng = Geolocation.getCurrentPosition()
-  .then((resp) => {
+  currentLatLng = Geolocation.getCurrentPosition().then((resp) => {
     this.currentLatLng = new google.maps.LatLng(
       resp.coords.latitude,
       resp.coords.longitude
-    );   });
+    );
+  });
 
-    //@Input() preorderList:any;
-    preorderList = this.navParams.get('liste');
 
-    @Output() preListEvent = new EventEmitter();
-//#endregion
+  preorderList = this.navParams.get("liste");
+
+  @Output() preListEvent = new EventEmitter();
+  //#endregion
   constructor(
     private nativeGeocoder: NativeGeocoder,
     public zone: NgZone,
     private ln: LaunchNavigator,
-    private ausliefererService: AuslieferungenService,
+    //private ausliefererService: AuslieferungenService,
     private modalCtrl: ModalController,
 
     private navParams: NavParams
@@ -112,8 +117,8 @@ export class AusliefererMapPage implements OnInit {
   ngOnInit() {
     this.loadMap();
     const modalState = {
-      modal : true,
-      desc : 'fake state for our modal'//damit der user nicht eine seite zurück geht wenn er auf dem Modal den Hardware-Back-Button drückt
+      modal: true,
+      desc: "fake state for our modal", //damit der User nicht eine Seite zurück geht wenn er auf dem Modal den Hardware-Back-Button drückt
     };
     history.pushState(modalState, null);
   }
@@ -124,10 +129,8 @@ export class AusliefererMapPage implements OnInit {
     }
   }
 
-
-  
-  async getBusinessAddress(){
-    var address =  await Storage.get({ key: 'BetriebsLocation' }); 
+  async getBusinessAddress() {
+    var address = await Storage.get({ key: "BetriebsLocation" });
     return address.value;
   }
 
@@ -149,20 +152,8 @@ export class AusliefererMapPage implements OnInit {
           mapOptions
         );
 
-
         //For Routing
         this.directionsRenderer.setMap(this.map);
-
-        // this.map.addListener("tilesloaded", () => {
-        //   //listens to map-movements
-        //   console.log("accuracy", this.map, this.map.center.lat());
-        //   this.getAddressFromCoords(
-        //     this.map.center.lat(),
-        //     this.map.center.lng()
-        //   );
-        //   this.lat = this.map.center.lat();
-        //   this.long = this.map.center.lng();
-        // });
         this.calculateAndDisplayRoute();
       })
       .catch((error) => {
@@ -170,60 +161,33 @@ export class AusliefererMapPage implements OnInit {
       });
   }
   //#region Infowindow
-  async placeMarker(response, context, text){
-    // if(response == response.legs[0]){
-    //   var marker = new google.maps.Marker({
-    //     position: response.start_location,
-    //     label: 'H',
-    //     map: this.map
-    //   });
-
-    //   marker.addListener('click', function() {      
-    //     context.infowindow.close();//close previously opened infowindow
-    //     context.infowindow.setContent(text);      
-    //     context.infowindow.open(context.map, marker);      
-    //  });
-    //  this.markers.push(marker);
-    // }else{
-      const startAddress = await this.getBusinessAddress();
-      if(response.start_address.substring(0,3) === startAddress.substring(0,3)){
-        var startmarker = new google.maps.Marker({
-          position: response.start_location,
-          icon:{
-            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-          },
-          map: this.map
-        });
-      }
-      var marker = new google.maps.Marker({
-        position: response.end_location,
-        map: this.map
+  async placeMarker(response, context, text) {
+    const startAddress = await this.getBusinessAddress();
+    if (
+      response.start_address.substring(0, 3) === startAddress.substring(0, 3)//This can be done better somehow I just don't know how, compares only the first 3 letters because userinput and Google-Address Data may be different but google still recognizes it
+    ) {
+      var startmarker = new google.maps.Marker({
+        position: response.start_location,
+        icon: {
+          url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",//Marks the location of the business
+        },
+        map: this.map,
       });
-      marker.addListener('click', function() {      
-        context.infowindow.close();//close previously opened infowindow
-        context.infowindow.setContent(text);      
-        context.infowindow.open(context.map, marker);      
-     });
-     
-     //this.markers.push(marker);
-    //}
-    
+    }
+    var marker = new google.maps.Marker({
+      position: response.end_location,
+      map: this.map,
+    });
+    marker.addListener("click", function () {
+      context.infowindow.close(); //close previously opened infowindow
+      context.infowindow.setContent(text);
+      context.infowindow.open(context.map, marker);
+    });
   }
-  
-  // reloadMarkers(routeLegsArray, context, contentArray){
-  //   for(var i = 0; i< this.markers.length; i++){
-  //     this.markers[i].setMap(null);
-  //   }
-  //   for(var j = 0; i< this.markers.length; j++){
-  //     this.placeMarker(routeLegsArray[j], context, contentArray[i])
-  //   }
-  // }
-
-  
-
   //#endregion
-  //#region autocomplete
 
+  //#region autocomplete
+  //This functionality is not strictly needed since the address-data is provided by the database but the user may input other adresses manually if the need arises
   getCurrentAddress() {
     Geolocation.getCurrentPosition().then((resp) => {
       this.nativeGeocoder
@@ -259,11 +223,6 @@ export class AusliefererMapPage implements OnInit {
       });
   }
 
-  //FUNCTION SHOWING THE COORDINATES OF THE POINT AT THE CENTER OF THE MAP
-  ShowCords() {
-    alert("lat" + this.lat + ", long" + this.long);
-  }
-
   //AUTOCOMPLETE, SIMPLY LOAD THE PLACE USING GOOGLE PREDICTIONS AND RETURNING THE ARRAY.
   UpdateSearchResults() {
     if (this.autocomplete.input == "") {
@@ -284,15 +243,15 @@ export class AusliefererMapPage implements OnInit {
   }
   SelectSearchResult(item) {
     this.placeid = item.place_id;
-    this.waypointArray.push({
+    this.additionalWaypoints.push({
       location: item.description,
-      stopover: true,      
+      stopover: true,
     });
   }
 
-  deleteWaypoint(waypoint){
-    var wayptIndex = this.waypointArray.indexOf(waypoint);
-    this.waypointArray.splice(wayptIndex, 1);
+  deleteWaypoint(waypoint) {
+    var wayptIndex = this.additionalWaypoints.indexOf(waypoint);
+    this.additionalWaypoints.splice(wayptIndex, 1);
   }
 
   //lET'S BE CLEAN! THIS WILL JUST CLEAN THE LIST WHEN WE CLOSE THE SEARCH BAR.
@@ -306,94 +265,155 @@ export class AusliefererMapPage implements OnInit {
     return (window.location.href =
       "https://www.google.com/maps/search/?api=1&query=Google&query_place_id=" +
       this.placeid);
-  } 
+  }
   //#endregion
   //#region routeCalc
   async calculateAndDisplayRoute() {
     this.markers = [];
-    this.waypointArray=[];
-    // var routeLegsArray;
-    // var contentArray;    
+    this.waypointArray = [];
     var context = this;
     const address = await this.getBusinessAddress();
 
     ///////////test mit hardcodewaypoints später nochmal ändern
-    for(var i = 0; i<this.preorderList.length; i++){
+    for (var i = 0; i < this.preorderList.length; i++) {
       this.waypointArray.push({
         location: this.preorderList[i].DeliveryAddressData,
-        stopover: true,      
+        stopover: true,
       });
     }
-    
-  
+
     this.directionsService.route(
       {
-        origin: address,//Betriebsadresse
+        origin: address, //Betriebsadresse
         destination: address, //Betriebsadresse
-        waypoints: this.waypointArray, 
+        waypoints: this.waypointArray,
         optimizeWaypoints: true,
-        travelMode: 'DRIVING',
+        travelMode: "DRIVING",
         drivingOptions: {
           trafficModel: "pessimistic",
-          departureTime: new Date()
+          departureTime: new Date(),
         },
       },
       (response, status) => {
         if (status === "OK") {
-          this.directionsRenderer.setDirections(response);  
-            var my_route = response.routes[0];
-            
-            for (var i = 0; i < my_route.legs.length; i++){
+          this.directionsRenderer.setDirections(response);
+          var my_route = response.routes[0];
 
-                  for(var j = 0; j<context.preorderList.length; j++){
-                    
-                    if(my_route.legs[i].end_address.substring(0,3) === context.preorderList[j].DeliveryAddressData.substring(0,3)){//weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
-                      var content = `<div id="infowindow">
-                        Das ist Stop ${[i+1]} <br>
-                        Geschätzte Dauer ab dem letzten Stop: ${my_route.legs[i].duration.text} <br>
+          for (var i = 0; i < my_route.legs.length; i++) {
+            for (var j = 0; j < context.preorderList.length; j++) {
+              if (
+                my_route.legs[i].end_address.substring(0, 3) ===
+                context.preorderList[j].DeliveryAddressData.substring(0, 3)
+              ) {
+                //weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
+                var content = `<div id="infowindow">
+                        Das ist Stop ${[i + 1]} <br>
+                        Geschätzte Dauer ab dem letzten Stop: ${
+                          my_route.legs[i].duration.text
+                        } <br>
                         Name: ${context.preorderList[j].CustomerData}<br>
                         Preis: ${context.preorderList[j].TotalPrice}€<br>
                         Kommentar: ${context.preorderList[j].CustomerMessage}
                         </div>`;
-                        ///////In das div muss noch der anruf/SMS-Button für den kunden
-                      context.placeMarker(my_route.legs[i], context, content);
-                      // contentArray.push(content);
-                      // routeLegsArray.push(my_route.legs[i])
-                    }
-                  }
-              
+                ///////In das div muss noch der anruf/SMS-Button für den kunden
+                context.placeMarker(my_route.legs[i], context, content);
+              }
             }
-            
+          }
         }
-        //google.maps.event.trigger(this.map, 'resize');
       }
     );
-    
-    // this.reloadMarkers(routeLegsArray, context, contentArray);
-    // debugger;
   }
 
-  
+  async addAdditionalWaypoints(){
+    var context = this;
+    const address = await this.getBusinessAddress();
 
-  clearWaypoints(){  
+    this.waypointArray = this.waypointArray.concat(this.additionalWaypoints);
+
+    this.directionsService.route(
+      {
+        origin: address, //Betriebsadresse
+        destination: address, //Betriebsadresse
+        waypoints: this.waypointArray,
+        optimizeWaypoints: true,
+        travelMode: "DRIVING",
+        drivingOptions: {
+          trafficModel: "pessimistic",
+          departureTime: new Date(),
+        },
+      },
+      (response, status) => {
+        if (status === "OK") {
+          this.directionsRenderer.setDirections(response);
+          var my_route = response.routes[0];
+
+          for (var i = 0; i < my_route.legs.length; i++) {
+            for (var j = 0; j < context.preorderList.length; j++) {
+              if (
+                my_route.legs[i].end_address.substring(0, 3) ===
+                context.preorderList[j].DeliveryAddressData.substring(0, 3)
+              ) {
+                //weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
+                var content = `<div id="infowindow">
+                        Das ist Stop ${[i + 1]} <br>
+                        Geschätzte Dauer ab dem letzten Stop: ${
+                          my_route.legs[i].duration.text
+                        } <br>
+                        Name: ${context.preorderList[j].CustomerData}<br>
+                        Preis: ${context.preorderList[j].TotalPrice}€<br>
+                        Kommentar: ${context.preorderList[j].CustomerMessage}
+                        </div>`;
+                ///////In das div muss noch der anruf/SMS-Button für den kunden
+                context.placeMarker(my_route.legs[i], context, content);
+              }
+            }
+            for (var k = 0; k<this.commentArray.length; k++){
+              if(my_route.legs[i].end_address.substring(0, 3) ===
+              context.commentArray[k].address.location.substring(0, 3)){
+                var content= `<div id="infowindow">
+                ${context.commentArray[k].comment}
+                </div>`;
+                context.placeMarker(my_route.legs[i], context, content);
+              }
+            }
+          }
+        }
+      }
+    );
+  }
+
+  async addComment(waypoint){
+    const mapModal = await this.modalCtrl.create({
+      component: FahrerKommentarPage,
+      componentProps:{
+        'waypoint': waypoint
+      },
+    });
+
+    mapModal.onDidDismiss().then((dataReturned)=>{
+      if(dataReturned !== null){      
+        this.commentArray.push(dataReturned['data']);
+      }
+     
+    });
+    return await mapModal.present();
+  }
+
+  clearWaypoints() {
     let i = 0;
-    while(i<this.waypointArray.length){
+    while (i < this.additionalWaypoints.length) {
       this.deleteWaypoint(i);
     }
-  } 
+  }
   //#endregion
   //#region tracking
   // Muss noch angepasst werden mit der ID vom Fahrer etc
 
   async loadHistoricRoutes() {
-    // this.storage.get('routes').then(data => { //Aus der Datenbank machen
-    //   if (data) {
-    //     this.previousTracks = data;
-    //   }
-    // });
-    const ret = await Storage.get({ key: TOKEN_KEY });    
+    const ret = await Storage.get({ key: TOKEN_KEY });//Muss noch mit Datenbank gemacht werden
     const prevRoutes = JSON.parse(ret.value);
-    if(prevRoutes){
+    if (prevRoutes) {
       this.previousTracks = prevRoutes;
     }
   }
@@ -401,49 +421,48 @@ export class AusliefererMapPage implements OnInit {
   startTracking() {
     this.isTracking = true;
     this.trackedRoute = [];
-      
-      this.watch = Geolocation.watchPosition({}, (position, err) =>{
-        if(position){
-          this.trackedRoute.push({ lat: position.coords.latitude, lng: position.coords.longitude });
-          this.redrawPath(this.trackedRoute);
-        }
-      });
+
+    this.watch = Geolocation.watchPosition({}, (position, err) => {
+      if (position) {
+        this.trackedRoute.push({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        this.redrawPath(this.trackedRoute);
+      }
+    });
   }
 
-    stopTracking() {
-      let newRoute = { finished: new Date().getTime(), path: this.trackedRoute };
-      this.previousTracks.push(newRoute);
-      Storage.set({key: TOKEN_KEY, value: JSON.stringify(this.previousTracks)});//Datenbank
-     
-      this.isTracking = false;
-      Geolocation.clearWatch({id: TOKEN_ID});
-      this.currentMapTrack.setMap(null);
-    }
-     
-    showHistoryRoute(route) {
-      this.redrawPath(route);
-    }
- 
+  stopTracking() {
+    let newRoute = { finished: new Date().getTime(), path: this.trackedRoute };
+    this.previousTracks.push(newRoute);
+    Storage.set({ key: TOKEN_KEY, value: JSON.stringify(this.previousTracks) }); //Datenbank
+
+    this.isTracking = false;
+    Geolocation.clearWatch({ id: TOKEN_ID });
+    this.currentMapTrack.setMap(null);
+  }
+
+  showHistoryRoute(route) {
+    this.redrawPath(route);
+  }
+
   redrawPath(path) {
     if (this.currentMapTrack) {
       this.currentMapTrack.setMap(null);
     }
- 
+
     if (path.length > 1) {
       this.currentMapTrack = new google.maps.Polyline({
         path: path,
         geodesic: true,
-        strokeColor: '#ff00ff',
+        strokeColor: "#ff00ff",
         strokeOpacity: 1.0,
-        strokeWeight: 3
+        strokeWeight: 3,
       });
       this.currentMapTrack.setMap(this.map);
     }
   }
-
-
-
-
 
   //  Perform an anonymous login and load data
   // anonLogin() {
@@ -466,7 +485,7 @@ export class AusliefererMapPage implements OnInit {
   //       this.updateMap(locations);
   //     });
   //   });
-  // } 
+  // }
   // Use Capacitor to track our geolocation
   // startTracking() {
   //   this.isTracking = true;
@@ -516,35 +535,34 @@ export class AusliefererMapPage implements OnInit {
 
   //#endregion
   //#region MapsLaunch
-  createWaypointString(){
-    for(let i = 0; i < this.waypointArray.length; i++){
-      if(i<this.waypointArray.length){
-        this.waypointString = this.waypointArray[i].toString() + "+to:";
-      }
-      else{
+  createWaypointString() {
+    for (let i = 0; i < this.waypointArray.length; i++) {
+      if (i < this.waypointArray.length) {
+        this.waypointString = this.waypointArray[i].toString() + "+to:";//Hier vielleicht die Adresse des waypoints nicht das ganze ding
+      } else {
         this.waypointString = this.waypointArray[i].toString();
       }
     }
   }
 
-  async launchnavigator(){
+  async launchnavigator() {
     const address = await this.getBusinessAddress();
-    this.ln.navigate(this.waypointString,{
-      start: address//adresse vom betrieb
-    });  
-    for (var i = 0; i<this.preorderList.length; i++){
+    this.ln.navigate(this.waypointString, {
+      start: address, //adresse vom betrieb
+    });
+    for (var i = 0; i < this.preorderList.length; i++) {
       this.preorderList[i].Status = 4;
-    }  
+    }
   }
   //#endregion
-  @HostListener('window:popstate', ['$event'])
-  abbruch(){
+  @HostListener("window:popstate", ["$event"])
+  abbruch() {
     this.preListEvent.emit(this.preorderList);
     this.modalCtrl.dismiss(this.preorderList);
   }
 
-  fahrtBeendet(){
-    for(var i = 0; i<this.preorderList.length; i++){
+  fahrtBeendet() {
+    for (var i = 0; i < this.preorderList.length; i++) {
       this.preorderList[i].Status = 5;
     }
     this.preListEvent.emit(this.preorderList);

@@ -1,0 +1,13 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{waypoint.location}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-buttons>
+    <ion-input  [(ngModel)]="kommentar"></ion-input>
+    <ion-button (click)="speichern()">Kommentar speichern</ion-button>
+    <ion-button (click)="abbruch()">Abbruch</ion-button>
+  </ion-buttons>
+</ion-content>
