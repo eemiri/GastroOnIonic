@@ -48,12 +48,12 @@ export class AuslieferungenPage implements OnInit {
   async getPreOrderList(){//kriegt alle bestellungen, periodisch refreshen,
     const ret = await Storage.get({ key: 'BetriebsID' });    
     const id = JSON.parse(ret.value);
-    setTimeout(() =>{//noch einen Fall einbauen wo der call nicht funktioniert
+    setInterval(() =>{//noch einen Fall einbauen wo der call nicht funktioniert
       this.lieferungen.getPreOrders(id).subscribe( (res) =>{
         this.preorderList = [];
         this.preorderList = JSON.parse(res.Data)
     });
-    }, 10000);
+    }, 10000);//Mit Intervall damit man regelmäßig checkt und die liste geupdatet hält
   }
 
   setPreorderToDriver(status: number){
