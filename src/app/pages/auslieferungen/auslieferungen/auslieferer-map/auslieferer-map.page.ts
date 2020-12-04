@@ -325,7 +325,7 @@ export class AusliefererMapPage implements OnInit {
     );
   }
 
-  async addAdditionalWaypoints(){
+  async addAdditionalWaypoints(){//Driver may add additional waypoints with comment
     var context = this;
     const address = await this.getBusinessAddress();
 
