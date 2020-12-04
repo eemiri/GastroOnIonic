@@ -163,6 +163,7 @@ export class AusliefererMapPage implements OnInit {
   //#region Infowindow
   async placeMarker(response, context, text) {
     const startAddress = await this.getBusinessAddress();
+    debugger;
     if (
       response.start_address.substring(0, 3) === startAddress.substring(0, 3)//This can be done better somehow I just don't know how, compares only the first 3 letters because userinput and Google-Address Data may be different but google still recognizes it
     ) {
@@ -182,7 +183,7 @@ export class AusliefererMapPage implements OnInit {
       context.infowindow.close(); //close previously opened infowindow
       context.infowindow.setContent(text);
       context.infowindow.open(context.map, marker);
-    });
+    });//////////INFOWINDOWS ZU END_LOCATION NOCH SPEICHERN
   }
   //#endregion
 
@@ -269,7 +270,7 @@ export class AusliefererMapPage implements OnInit {
   //#endregion
   //#region routeCalc
   async calculateAndDisplayRoute() {
-    this.markers = [];
+   //this.markers = [];
     this.waypointArray = [];
     var context = this;
     const address = await this.getBusinessAddress();
@@ -328,14 +329,15 @@ export class AusliefererMapPage implements OnInit {
   async addAdditionalWaypoints(){//Driver may add additional waypoints with comment
     var context = this;
     const address = await this.getBusinessAddress();
+    var givenWaypts = this.waypointArray;
 
-    this.waypointArray = this.waypointArray.concat(this.additionalWaypoints);
+    givenWaypts = givenWaypts.concat(this.additionalWaypoints);
 
     this.directionsService.route(
       {
         origin: address, //Betriebsadresse
         destination: address, //Betriebsadresse
-        waypoints: this.waypointArray,
+        waypoints: givenWaypts,
         optimizeWaypoints: true,
         travelMode: "DRIVING",
         drivingOptions: {
@@ -346,14 +348,17 @@ export class AusliefererMapPage implements OnInit {
       (response, status) => {
         if (status === "OK") {
           this.directionsRenderer.setDirections(response);
+          let markerArray: Array<any> = [];
           var my_route = response.routes[0];
-
           for (var i = 0; i < my_route.legs.length; i++) {
             for (var j = 0; j < context.preorderList.length; j++) {
+              let p =my_route.legs[i].end_address.substring(0, my_route.legs[i].end_address.indexOf(',')); 
+                let h = context.preorderList[j].DeliveryAddressData.substring(0, context.preorderList[j].DeliveryAddressData.indexOf(','));
               if (
-                my_route.legs[i].end_address.substring(0, 3) ===
-                context.preorderList[j].DeliveryAddressData.substring(0, 3)
+                my_route.legs[i].end_address.substring(0, my_route.legs[i].end_address.indexOf(',')) ===
+                context.preorderList[j].DeliveryAddressData.substring(0, context.preorderList[j].DeliveryAddressData.indexOf(','))
               ) {
+                
                 //weil die adressendarstellung von google anders ist als normale usereingaben, kann probleme werfen wenn der user die straßennamen nicht richtig eingibt, google findet die straßen trotzdem aber es werden keine marker gesetzt
                 var content = `<div id="infowindow">
                         Das ist Stop ${[i + 1]} <br>
@@ -365,23 +370,44 @@ export class AusliefererMapPage implements OnInit {
                         Kommentar: ${context.preorderList[j].CustomerMessage}
                         </div>`;
                 ///////In das div muss noch der anruf/SMS-Button für den kunden
-                context.placeMarker(my_route.legs[i], context, content);
+                //context.placeMarker(my_route.legs[i], context, content);
+                let marker = {leg:my_route.legs[i], context:context, content:content};
+                debugger;
+                markerArray.push(marker);
+                
               }
             }
-            for (var k = 0; k<this.commentArray.length; k++){
-              if(my_route.legs[i].end_address.substring(0, 3) ===
-              context.commentArray[k].address.location.substring(0, 3)){
+            for (let k = 0; k<this.commentArray.length; k++){
+              let p =my_route.legs[i].end_address.substring(0, my_route.legs[i].end_address.indexOf(',')); 
+              let h =context.commentArray[k].address.location.substring(0, context.commentArray[k].address.location.indexOf(','));
+              ///////////////////////////////////////////////MUSS EINEN ANDEREN CHECK EINBAUEN DER NOCH SCHAUT O STRA?E ODER STR. BENUTZT WIRD; DAS HIER IST UNAUSREICHEND
+              if(my_route.legs[i].end_address.substring(0, my_route.legs[i].end_address.indexOf(',')) ===
+              context.commentArray[k].address.location.substring(0, context.commentArray[k].address.location.indexOf(','))){
+            
                 var content= `<div id="infowindow">
                 ${context.commentArray[k].comment}
                 </div>`;
-                context.placeMarker(my_route.legs[i], context, content);
+                let marker = {leg:my_route.legs[i], context:context, content:content};
+                debugger;
+                markerArray.push(marker);
+                
+                //context.placeMarker(my_route.legs[i], context, content);
               }
             }
           }
+          console.log(my_route.legs);
+          console.log(markerArray);
+          for(let y=0; y<markerArray.length; y++){
+            this.placeMarker(markerArray[y].leg, context, markerArray[y].content)
+          }
+          console.log(this.commentArray);
+          
         }
+      
       }
     );
-  }
+    } 
+  
 
   async addComment(waypoint){
     const mapModal = await this.modalCtrl.create({
